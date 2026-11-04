@@ -1,3 +1,5 @@
+// xcode: set sdk=iOS
+
 //
 //  HomeView.swift
 //  MobileFitnessApp
@@ -7,6 +9,11 @@
 import SwiftUI
 
 struct HomeView: View {
+    //One shared copy of each view model, passed down to every tab
+    @State private var exerciseVM = ExerciseViewModel()
+    @State private var workoutVM = WorkoutViewModel()
+    @State private var logVM = LogViewModel()
+
     var body: some View {
         TabView {
             
@@ -30,6 +37,9 @@ struct HomeView: View {
                     Label("Log", systemImage: "calendar")
                 }
         }
+        .environment(exerciseVM)
+        .environment(workoutVM)
+        .environment(logVM)
     }
 }
 
