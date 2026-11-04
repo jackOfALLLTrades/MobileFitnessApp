@@ -12,13 +12,18 @@ import SwiftData
 final class Exercise {
     var name: String
     var muscleGroup: String?
+    var isBuiltIn: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \RoutineExercise.exercise)
     var routineUsages: [RoutineExercise] = []
 
-    init(name: String, muscleGroup: String? = nil) {
+    init(
+        name: String,
+        muscleGroup: String? = nil,
+        isBuiltIn: Bool = false
+    ) {
         self.name = name
         self.muscleGroup = muscleGroup
+        self.isBuiltIn = isBuiltIn
     }
 }
-

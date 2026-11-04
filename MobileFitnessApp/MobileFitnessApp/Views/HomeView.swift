@@ -15,14 +15,10 @@ struct HomeView: View {
                     Label("Home", systemImage: "house")
                 }
 
-            NavigationStack {
-                Text("Your routines will appear here.")
-                    .foregroundStyle(.secondary)
-                    .navigationTitle("Workout")
-            }
-            .tabItem {
-                Label("Workout", systemImage: "dumbbell")
-            }
+            RoutineListView()
+                .tabItem {
+                    Label("Workout", systemImage: "dumbbell")
+                }
 
             NavigationStack {
                 Text("Your workout history will appear here.")
