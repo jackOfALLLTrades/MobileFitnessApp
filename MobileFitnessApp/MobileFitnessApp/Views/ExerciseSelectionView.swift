@@ -45,11 +45,20 @@ struct ExerciseSelectionView: View {
         "Other"
     ]
 
-    init(selectedExercises: Binding<[Exercise]>) {
+    private let replacementTargetID: PersistentIdentifier?
+    private let onReplace: ((Exercise) -> Void)?
+
+    init(
+        selectedExercises: Binding<[Exercise]>,
+        replacementTargetID: PersistentIdentifier? = nil,
+        onReplace: ((Exercise) -> Void)? = nil
+    ) {
         self._selectedExercises = selectedExercises
         self._draftSelection = State(
             initialValue: selectedExercises.wrappedValue
         )
+        self.replacementTargetID = replacementTargetID
+        self.onReplace = onReplace
     }
 
     private var filteredExercises: [Exercise] {
@@ -137,7 +146,11 @@ struct ExerciseSelectionView: View {
                 }
             }
         }
-        .navigationTitle("Select Exercises")
+        .navigationTitle(
+            replacementTargetID == nil
+                ? "Select Exercises"
+                : "Replace Exercise"
+        )
         .searchable(text: $searchText, prompt: "Search exercises")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -164,9 +177,15 @@ struct ExerciseSelectionView: View {
             }
 
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done") {
-                    selectedExercises = draftSelection
-                    dismiss()
+                if replacementTargetID == nil {
+                    Button("Done") {
+                        selectedExercises = draftSelection
+                        dismiss()
+                    }
+                } else {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
             }
         }
@@ -180,7 +199,16 @@ struct ExerciseSelectionView: View {
 
     private func exerciseRow(_ exercise: Exercise) -> some View {
         Button {
-            toggleExercise(exercise)
+            if replacementTargetID != nil {
+                guard !isAlreadySelectedElsewhere(exercise) else {
+                    return
+                }
+
+                onReplace?(exercise)
+                dismiss()
+            } else {
+                toggleExercise(exercise)
+            }
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -211,17 +239,34 @@ struct ExerciseSelectionView: View {
                 Spacer()
 
                 Image(
-                    systemName: isSelected(exercise)
-                        ? "checkmark.circle.fill"
-                        : "circle"
+                    systemName: replacementTargetID != nil
+                        ? (
+                            exercise.persistentModelID == replacementTargetID
+                                ? "checkmark.circle.fill"
+                                : "circle"
+                        )
+                        : (
+                            isSelected(exercise)
+                                ? "checkmark.circle.fill"
+                                : "circle"
+                        )
                 )
                 .foregroundStyle(
-                    isSelected(exercise) ? .blue : .secondary
+                    replacementTargetID != nil
+                        ? (
+                            exercise.persistentModelID == replacementTargetID
+                                ? .blue
+                                : .secondary
+                        )
+                        : (
+                            isSelected(exercise) ? .blue : .secondary
+                        )
                 )
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(isAlreadySelectedElsewhere(exercise))
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if !exercise.isBuiltIn {
                 Button(role: .destructive) {
@@ -236,6 +281,19 @@ struct ExerciseSelectionView: View {
     private func isSelected(_ exercise: Exercise) -> Bool {
         draftSelection.contains {
             $0.persistentModelID == exercise.persistentModelID
+        }
+    }
+    
+    private func isAlreadySelectedElsewhere(
+        _ exercise: Exercise
+    ) -> Bool {
+        guard replacementTargetID != nil else {
+            return false
+        }
+
+        return selectedExercises.contains {
+            $0.persistentModelID == exercise.persistentModelID &&
+            $0.persistentModelID != replacementTargetID
         }
     }
 

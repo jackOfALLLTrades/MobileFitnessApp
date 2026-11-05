@@ -9,15 +9,28 @@ import SwiftUI
 import SwiftData
 
 struct RoutineListView: View {
+
     @Environment(\.modelContext) private var modelContext
 
-    @Query(sort: \Routine.name)
+    @EnvironmentObject private var workoutSessionManager:
+        WorkoutSessionManager
+
+    @Query(sort: [
+        SortDescriptor(\Routine.sortOrder),
+        SortDescriptor(\Routine.name)
+    ])
     private var routines: [Routine]
 
+    @State private var routineToEdit: Routine?
+
     var body: some View {
+
         NavigationStack {
+
             List {
+
                 if routines.isEmpty {
+
                     ContentUnavailableView(
                         "No Routines Yet",
                         systemImage: "dumbbell",
@@ -25,34 +38,83 @@ struct RoutineListView: View {
                             "Create a routine to organize your workouts."
                         )
                     )
-                } else {
-                    ForEach(routines) { routine in
-                        NavigationLink {
-                            CreateRoutineView(routine: routine)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(routine.name)
-                                    .font(.headline)
 
-                                Text("\(routine.exercises.count) exercises")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                } else {
+
+                    ForEach(routines) { routine in
+
+                        VStack(alignment: .leading, spacing: 12) {
+
+                            HStack(alignment: .top) {
+
+                                VStack(alignment: .leading, spacing: 4) {
+
+                                    Text(routine.name)
+                                        .font(.headline)
+
+                                    Text("\(routine.exercises.count) exercises")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                Menu {
+
+                                    Button {
+                                        routineToEdit = routine
+                                    } label: {
+                                        Label(
+                                            "Edit Routine",
+                                            systemImage: "pencil"
+                                        )
+                                    }
+
+                                    Button(role: .destructive) {
+                                        deleteRoutine(routine)
+                                    } label: {
+                                        Label(
+                                            "Delete Routine",
+                                            systemImage: "trash"
+                                        )
+                                    }
+
+                                } label: {
+
+                                    Image(systemName: "ellipsis")
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 36, height: 36)
+                                        .contentShape(Rectangle())
+                                }
                             }
-                            .padding(.vertical, 4)
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                deleteRoutine(routine)
+
+                            Button {
+                                startWorkout(from: routine)
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Label("Start Routine", systemImage: "play.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 11)
+                                    .contentShape(Rectangle())
                             }
+                            .buttonStyle(.plain)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(.quaternary.opacity(0.5))
+                            )
+                            .disabled(workoutSessionManager.activeSession != nil)
                         }
+                        .padding(.vertical, 8)
                     }
+                    .onMove(perform: moveRoutines)
                 }
             }
             .navigationTitle("Routines")
             .toolbar {
+
                 ToolbarItem(placement: .topBarTrailing) {
+
                     NavigationLink {
                         CreateRoutineView()
                     } label: {
@@ -60,19 +122,112 @@ struct RoutineListView: View {
                     }
                 }
             }
+            .sheet(item: $routineToEdit) { routine in
+
+                NavigationStack {
+                    CreateRoutineView(routine: routine)
+                }
+            }
         }
     }
 
+    // MARK: - Routine Management
+
     private func deleteRoutine(_ routine: Routine) {
+
         modelContext.delete(routine)
+        saveChanges()
+    }
+
+    private func moveRoutines(
+        from source: IndexSet,
+        to destination: Int
+    ) {
+
+        var reorderedRoutines = routines
+
+        reorderedRoutines.move(
+            fromOffsets: source,
+            toOffset: destination
+        )
+
+        for (index, routine) in reorderedRoutines.enumerated() {
+            routine.sortOrder = index
+        }
+
+        saveChanges()
+    }
+
+    // MARK: - Start Workout
+
+    private func startWorkout(from routine: Routine) {
+
+        guard workoutSessionManager.activeSession == nil else {
+            return
+        }
+
+        let session = WorkoutSession(name: routine.name)
+
+        modelContext.insert(session)
+
+        let orderedExercises = routine.exercises.sorted {
+            $0.order < $1.order
+        }
+
+        for (exerciseIndex, routineExercise) in orderedExercises.enumerated() {
+
+            let sessionExercise = SessionExercise(
+                exerciseName: routineExercise.exercise.name,
+                order: exerciseIndex
+            )
+
+            sessionExercise.session = session
+            modelContext.insert(sessionExercise)
+
+            let plannedSetCount = max(1, routineExercise.plannedSets)
+
+            for setIndex in 0..<plannedSetCount {
+
+                let workoutSet = WorkoutSet(order: setIndex)
+                workoutSet.sessionExercise = sessionExercise
+
+                modelContext.insert(workoutSet)
+            }
+        }
+
+        do {
+
+            try modelContext.save()
+
+            workoutSessionManager.beginSession(session)
+
+        } catch {
+
+            print("Failed to start workout: \(error)")
+        }
+    }
+
+    // MARK: - Saving
+
+    private func saveChanges() {
+
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save routines: \(error)")
+        }
     }
 }
 
 #Preview {
     RoutineListView()
+        .environmentObject(WorkoutSessionManager())
         .modelContainer(for: [
             Exercise.self,
             Routine.self,
-            RoutineExercise.self
+            RoutineExercise.self,
+            WorkoutSession.self,
+            SessionExercise.self,
+            WorkoutSet.self
         ])
 }
