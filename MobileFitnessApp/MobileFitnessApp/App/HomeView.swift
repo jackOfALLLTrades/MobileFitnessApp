@@ -10,11 +10,17 @@ import SwiftData
 
 struct HomeView: View {
 
+    // MARK: - Dependencies
+
     @EnvironmentObject private var workoutSessionManager: WorkoutSessionManager
     @Environment(\.modelContext) private var modelContext
 
+    // MARK: - Presentation State
+
     @State private var selectedTab = 0
     @State private var showingCancelConfirmation = false
+
+    // MARK: - Content
 
     var body: some View {
         TabView(selection: $selectedTab) {

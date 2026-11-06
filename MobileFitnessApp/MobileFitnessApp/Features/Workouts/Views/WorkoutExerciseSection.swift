@@ -28,7 +28,6 @@ struct WorkoutExerciseSection: View {
     var body: some View {
         Section {
 
-            // Exercise name and options menu
             HStack {
                 Text(exercise.exerciseName)
                     .font(.headline)
@@ -71,10 +70,8 @@ struct WorkoutExerciseSection: View {
             }
             .listRowSeparator(.hidden)
 
-            // Column headings
             SetColumnHeadings(style: .workout)
 
-            // Individual set rows
             ForEach(
                 exercise.sets.sorted { $0.order < $1.order }
             ) { workoutSet in
@@ -103,7 +100,6 @@ struct WorkoutExerciseSection: View {
                 }
             }
 
-            // Add Set
             Button(action: onAddSet) {
                 Label("Add Set", systemImage: "plus")
                     .font(.subheadline.weight(.semibold))

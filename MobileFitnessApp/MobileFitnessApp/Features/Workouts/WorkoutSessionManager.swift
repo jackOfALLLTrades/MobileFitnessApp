@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 import Combine
 
+/// Coordinates saved workout lifecycle operations with active and minimized app state.
 @MainActor
 final class WorkoutSessionManager: ObservableObject {
 
@@ -34,25 +35,21 @@ final class WorkoutSessionManager: ObservableObject {
         clearSession()
     }
 
-    // Minimizes the active workout.
     func minimizeSession() {
         guard activeSession != nil else { return }
         isMinimized = true
     }
 
-    // Reopens a minimized workout.
     func reopenSession() {
         guard activeSession != nil else { return }
         isMinimized = false
     }
 
-    // Clears the active workout after finishing or discarding it.
     private func clearSession() {
         activeSession = nil
         isMinimized = false
     }
 
-    // Restores an unfinished workout when the app launches.
     func restoreActiveSession(
         from modelContext: ModelContext
     ) throws {

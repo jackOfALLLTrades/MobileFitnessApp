@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// A lift in the library, shared by routine blueprints.
 @Model
 final class Exercise {
     var name: String

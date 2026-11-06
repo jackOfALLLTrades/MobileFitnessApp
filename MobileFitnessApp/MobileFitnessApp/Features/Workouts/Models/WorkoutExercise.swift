@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// An exercise snapshot within a workout; its logged sets belong to this attempt.
 @Model
 final class WorkoutExercise {
     var exerciseName: String

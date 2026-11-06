@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// A reusable workout blueprint, separate from logged workout records.
 @Model
 final class Routine {
     var name: String

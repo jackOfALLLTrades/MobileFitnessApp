@@ -18,7 +18,7 @@ struct RoutineExerciseSection: View {
 
     var body: some View {
         Section {
-            // Exercise name and management menu.
+
             HStack {
                 Text(exercise.name)
                     .font(.headline)
@@ -65,10 +65,8 @@ struct RoutineExerciseSection: View {
             }
             .listRowSeparator(.hidden)
 
-            // Column headings.
             SetColumnHeadings(style: .routine)
 
-            // Individual set rows.
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
                 RoutineSetRow(number: index + 1)
                 .swipeActions(
@@ -88,7 +86,6 @@ struct RoutineExerciseSection: View {
                 }
             }
 
-            // Add set button.
             Button {
                 onAddSet()
             } label: {

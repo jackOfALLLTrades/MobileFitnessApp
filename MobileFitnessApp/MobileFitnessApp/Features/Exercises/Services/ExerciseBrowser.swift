@@ -19,6 +19,7 @@ struct ExerciseGroup: Identifiable {
     var id: String { name }
 }
 
+/// Shares exercise search and picker grouping without owning selection or persistence.
 enum ExerciseBrowser {
     private static let muscleGroupOrder = [
         "Chest",

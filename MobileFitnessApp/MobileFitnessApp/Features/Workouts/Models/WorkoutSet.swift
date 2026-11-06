@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// The entered weight, reps, and completion state for one workout set.
 @Model
 final class WorkoutSet {
     var weight: Double?

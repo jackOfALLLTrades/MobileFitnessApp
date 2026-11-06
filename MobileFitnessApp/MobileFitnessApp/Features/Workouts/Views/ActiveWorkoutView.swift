@@ -19,6 +19,8 @@ struct ActiveWorkoutView: View {
 
 private struct ActiveWorkoutContent: View {
 
+    // MARK: - Dependencies
+
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var workoutSessionManager: WorkoutSessionManager
@@ -30,6 +32,8 @@ private struct ActiveWorkoutContent: View {
     private var availableExercises: [Exercise]
 
     let session: WorkoutSession
+
+    // MARK: - Presentation State
 
     @State private var showingFinishConfirmation = false
     @State private var showingDiscardConfirmation = false
@@ -47,28 +51,36 @@ private struct ActiveWorkoutContent: View {
     @State private var exerciseBeingDeleted: WorkoutExercise?
     @State private var replacementTargetID: PersistentIdentifier?
 
+    // MARK: - Editing State
+
     @State private var workoutEditor: ActiveWorkoutViewModel
+
+    // MARK: - Initialization
 
     init(session: WorkoutSession, modelContext: ModelContext) {
         self.session = session
         _workoutEditor = State(initialValue: ActiveWorkoutViewModel(modelContext: modelContext))
     }
 
+    // MARK: - Derived Values
+
     private var orderedExercises: [WorkoutExercise] {
         session.exercises.sorted { $0.order < $1.order }
     }
 
+    // MARK: - Content
+
     var body: some View {
         List {
 
-            // MARK: Workout Header
+            // MARK: - Workout Header
 
             WorkoutHeaderView(
                 startDate: session.startDate,
                 exerciseCount: orderedExercises.count
             )
 
-            // MARK: Exercises
+            // MARK: - Exercises
 
             ForEach(orderedExercises) { exercise in
                 WorkoutExerciseSection(
@@ -109,7 +121,7 @@ private struct ActiveWorkoutContent: View {
                 )
             }
 
-            // MARK: Workout Actions
+            // MARK: - Workout Actions
 
             WorkoutActionsView(
                 onAddExercise: {
@@ -136,7 +148,7 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
-        // MARK: Exercise Selection
+        // MARK: - Exercise Selection
 
         .sheet(
             isPresented: $showingExerciseSelection,
@@ -149,7 +161,7 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
-        // MARK: Exercise Reordering
+        // MARK: - Exercise Reordering
 
         .sheet(
             isPresented: $showingReorderExercises,
@@ -163,7 +175,7 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
-        // MARK: Exercise Replacement
+        // MARK: - Exercise Replacement
 
         .sheet(
             isPresented: $showingReplacementSelection,
@@ -191,7 +203,7 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
-        // MARK: Confirmation Dialogs
+        // MARK: - Confirmation Dialogs
 
         .confirmationDialog(
             "Finish Workout?",
@@ -241,7 +253,7 @@ private struct ActiveWorkoutContent: View {
             Text("This will remove the exercise and all of its sets from this workout.")
         }
 
-        // MARK: Alerts
+        // MARK: - Alerts
 
         .alert(
             "Exercise Unavailable",

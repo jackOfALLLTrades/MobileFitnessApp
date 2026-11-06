@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// An exercise placement in a routine, including order and planned set count.
 @Model
 final class RoutineExercise {
     var exercise: Exercise

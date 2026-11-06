@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+/// One workout attempt; active and completed workouts use the same model.
 @Model
 final class WorkoutSession {
     var name: String

@@ -23,19 +23,27 @@ private enum RoutineEditorSheet: Identifiable {
 }
 
 struct RoutineEditorView: View {
+    // MARK: - Dependencies
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
     @Query private var routines: [Routine]
 
+    // MARK: - Editing and Presentation State
+
     private let isEditing: Bool
     @State private var editor: RoutineEditorViewModel
     @State private var activeSheet: RoutineEditorSheet?
+
+    // MARK: - Initialization
 
     init(routine: Routine? = nil) {
         isEditing = routine != nil
         _editor = State(initialValue: RoutineEditorViewModel(routine: routine))
     }
+
+    // MARK: - Content
 
     var body: some View {
         Form {
@@ -115,6 +123,8 @@ struct RoutineEditorView: View {
             }
         }
     }
+
+    // MARK: - Persistence
 
     private func saveRoutine() {
         do {

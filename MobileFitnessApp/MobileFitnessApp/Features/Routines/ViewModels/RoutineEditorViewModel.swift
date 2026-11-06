@@ -13,10 +13,14 @@ import Observation
 @MainActor
 @Observable
 final class RoutineEditorViewModel {
+    // MARK: - Draft State
+
     private let routine: Routine?
     var routineName: String
     var selectedExercises: [Exercise]
     private(set) var setRowIDs: [PersistentIdentifier: [UUID]]
+
+    // MARK: - Initialization
 
     init(routine: Routine? = nil) {
         self.routine = routine
@@ -28,6 +32,8 @@ final class RoutineEditorViewModel {
         })
     }
 
+    // MARK: - Validation
+
     private var trimmedName: String {
         routineName.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -35,6 +41,8 @@ final class RoutineEditorViewModel {
     var isValid: Bool {
         !trimmedName.isEmpty && !selectedExercises.isEmpty
     }
+
+    // MARK: - Draft Editing
 
     func syncSetRows() {
         for exercise in selectedExercises {
@@ -102,6 +110,8 @@ final class RoutineEditorViewModel {
 
         setRowIDs.removeValue(forKey: id)
     }
+
+    // MARK: - Persistence
 
     func save(in modelContext: ModelContext, existingRoutines: [Routine]) throws {
         let savedRoutine: Routine

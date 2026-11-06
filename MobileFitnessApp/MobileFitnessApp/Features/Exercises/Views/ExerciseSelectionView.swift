@@ -9,11 +9,15 @@ import SwiftUI
 import SwiftData
 
 struct ExerciseSelectionView: View {
+    // MARK: - Dependencies
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \Exercise.name)
     private var exercises: [Exercise]
+
+    // MARK: - Selection and Presentation State
 
     @Binding private var selectedExercises: [Exercise]
 
@@ -22,6 +26,8 @@ struct ExerciseSelectionView: View {
 
     private let replacementTargetID: PersistentIdentifier?
     private let onReplace: ((Exercise) -> Void)?
+
+    // MARK: - Initialization
 
     init(
         selectedExercises: Binding<[Exercise]>,
@@ -34,9 +40,13 @@ struct ExerciseSelectionView: View {
         self.onReplace = onReplace
     }
 
+    // MARK: - Derived Values
+
     private var exerciseGroups: [ExerciseGroup] {
         ExerciseBrowser.groups(exercises, searchText: selection.searchText, sortOption: selection.sortOption)
     }
+
+    // MARK: - Content
 
     var body: some View {
         List {
@@ -113,6 +123,8 @@ struct ExerciseSelectionView: View {
         }
     }
 
+    // MARK: - Exercise Rows
+
     private func exerciseRow(_ exercise: Exercise) -> some View {
         Button {
             if replacementTargetID != nil {
@@ -146,6 +158,8 @@ struct ExerciseSelectionView: View {
         }
     }
 
+    // MARK: - Selection Rules
+
     private func isAlreadySelectedElsewhere(
         _ exercise: Exercise
     ) -> Bool {
@@ -155,6 +169,8 @@ struct ExerciseSelectionView: View {
             replacementTargetID: replacementTargetID
         )
     }
+
+    // MARK: - Persistence
 
     private func deleteExercise(_ exercise: Exercise) {
         selection.removeExercise(exercise)

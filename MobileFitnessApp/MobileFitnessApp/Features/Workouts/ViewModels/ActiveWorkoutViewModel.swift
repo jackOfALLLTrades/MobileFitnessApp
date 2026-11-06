@@ -13,14 +13,21 @@ import SwiftData
 @MainActor
 @Observable
 final class ActiveWorkoutViewModel {
+    // MARK: - Draft State and Dependencies
+
+    // Keep partially typed values (such as "17.") intact while the numeric model is saved.
     private var weightDrafts: [PersistentIdentifier: String] = [:]
     private var repsDrafts: [PersistentIdentifier: String] = [:]
 
     private let modelContext: ModelContext
 
+    // MARK: - Initialization
+
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
+
+    // MARK: - Exercise Management
 
     func addExercises(_ selectedExercises: [Exercise], to session: WorkoutSession) {
         let existingNames = Set(
@@ -83,6 +90,8 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
+    // MARK: - Set Management
+
     func addSet(to exercise: WorkoutExercise) {
         let nextOrder = (exercise.sets.map(\.order).max() ?? -1) + 1
 
@@ -124,10 +133,13 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
+    // Renaming the snapshot preserves this workout exercise's existing sets.
     func replaceExercise(_ exercise: WorkoutExercise, with replacement: Exercise) {
         exercise.exerciseName = replacement.name
         saveChanges()
     }
+
+    // MARK: - Persistence
 
     private func saveChanges() {
         do {
@@ -136,6 +148,8 @@ final class ActiveWorkoutViewModel {
             print("Failed to save workout: \(error)")
         }
     }
+
+    // MARK: - Input Bindings
 
     func weightBinding(
         for workoutSet: WorkoutSet

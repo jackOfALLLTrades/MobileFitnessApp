@@ -40,6 +40,7 @@ struct PreviousPerformanceLookup {
                 $0.order < $1.order
             }
 
+            // Use the latest matching workout only; missing sets do not fall back to older sessions.
             guard let previousSet = previousSets.first(
                 where: { $0.order == setOrder }
             ) else {

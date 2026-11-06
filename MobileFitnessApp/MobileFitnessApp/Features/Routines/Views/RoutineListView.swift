@@ -10,6 +10,8 @@ import SwiftData
 
 struct RoutineListView: View {
 
+    // MARK: - Dependencies
+
     @Environment(\.modelContext) private var modelContext
 
     @EnvironmentObject private var workoutSessionManager:
@@ -21,7 +23,11 @@ struct RoutineListView: View {
     ])
     private var routines: [Routine]
 
+    // MARK: - Presentation State
+
     @State private var routineToEdit: Routine?
+
+    // MARK: - Content
 
     var body: some View {
 
