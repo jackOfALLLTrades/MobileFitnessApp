@@ -28,69 +28,39 @@ struct RoutineEditorView: View {
 
     @Query private var routines: [Routine]
 
-    private let routine: Routine?
-
-    @State private var routineName: String
-    @State private var selectedExercises: [Exercise]
-    @State private var setRowIDs: [PersistentIdentifier: [UUID]]
+    private let isEditing: Bool
+    @State private var editor: RoutineEditorViewModel
     @State private var activeSheet: RoutineEditorSheet?
 
     init(routine: Routine? = nil) {
-        self.routine = routine
-
-        let existingExercises = (routine?.exercises ?? [])
-            .sorted { $0.order < $1.order }
-
-        _routineName = State(initialValue: routine?.name ?? "")
-
-        _selectedExercises = State(
-            initialValue: existingExercises.map { $0.exercise }
-        )
-
-        _setRowIDs = State(
-            initialValue: Dictionary(
-                uniqueKeysWithValues: existingExercises.map { link in
-                    (
-                        link.exercise.persistentModelID,
-                        (0..<max(1, link.plannedSets)).map { _ in UUID() }
-                    )
-                }
-            )
-        )
-    }
-
-    private var trimmedName: String {
-        routineName.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var isValid: Bool {
-        !trimmedName.isEmpty && !selectedExercises.isEmpty
+        isEditing = routine != nil
+        _editor = State(initialValue: RoutineEditorViewModel(routine: routine))
     }
 
     var body: some View {
         Form {
             Section("Routine Information") {
-                TextField("Routine Name", text: $routineName)
+                TextField("Routine Name", text: $editor.routineName)
             }
 
             Section {
                 NavigationLink {
                     ExerciseSelectionView(
-                        selectedExercises: $selectedExercises
+                        selectedExercises: $editor.selectedExercises
                     )
                 } label: {
                     Label("Select Exercises", systemImage: "plus")
                 }
             }
 
-            if selectedExercises.isEmpty {
+            if editor.selectedExercises.isEmpty {
                 Section("Exercises") {
                     Text("No exercises selected.")
                         .foregroundStyle(.secondary)
                 }
             } else {
                 ForEach(
-                    selectedExercises,
+                    editor.selectedExercises,
                     id: \.persistentModelID
                 ) { exercise in
                     exerciseSection(for: exercise)
@@ -102,25 +72,25 @@ struct RoutineEditorView: View {
                 switch sheet {
                 case .reorder:
                     ReorderExercisesView(
-                        exercises: $selectedExercises,
+                        exercises: $editor.selectedExercises,
                         exerciseName: { exercise in exercise.name }
                     )
 
                 case .replace(let exercise, _):
                     ExerciseSelectionView(
-                        selectedExercises: $selectedExercises,
+                        selectedExercises: $editor.selectedExercises,
                         replacementTargetID: exercise.persistentModelID
                     ) { replacement in
-                        replaceExercise(exercise, with: replacement)
+                        editor.replaceExercise(exercise, with: replacement)
                     }
                 }
             }
         }
-        .onChange(of: selectedExercises.map(\.persistentModelID)) {
+        .onChange(of: editor.selectedExercises.map(\.persistentModelID)) {
             _, _ in
-            syncSetRows()
+            editor.syncSetRows()
         }
-        .navigationTitle(routine == nil ? "New Routine" : "Edit Routine")
+        .navigationTitle(isEditing ? "Edit Routine" : "New Routine")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -133,14 +103,14 @@ struct RoutineEditorView: View {
                 Button("Save") {
                     saveRoutine()
                 }
-                .disabled(!isValid)
+                .disabled(!editor.isValid)
             }
         }
     }
 
     private func exerciseSection(for exercise: Exercise) -> some View {
         let id = exercise.persistentModelID
-        let rows = setRowIDs[id] ?? []
+        let rows = editor.setRowIDs[id] ?? []
 
         return Section {
             // Exercise name and management menu.
@@ -173,7 +143,7 @@ struct RoutineEditorView: View {
                     Divider()
 
                     Button(role: .destructive) {
-                        removeExercise(exercise)
+                        editor.removeExercise(exercise)
                     } label: {
                         Label(
                             "Delete Exercise",
@@ -202,7 +172,7 @@ struct RoutineEditorView: View {
                 ) {
                     if rows.count > 1 {
                         Button(role: .destructive) {
-                            removeSet(for: exercise, rowID: rowID)
+                            editor.removeSet(for: exercise, rowID: rowID)
                         } label: {
                             Label(
                                 "Remove Set",
@@ -215,7 +185,7 @@ struct RoutineEditorView: View {
 
             // Add set button.
             Button {
-                addSet(for: exercise)
+                editor.addSet(for: exercise)
             } label: {
                 Label("Add Set", systemImage: "plus")
                     .frame(maxWidth: .infinity)
@@ -225,134 +195,15 @@ struct RoutineEditorView: View {
         }
     }
 
-    private func syncSetRows() {
-        for exercise in selectedExercises {
-            let id = exercise.persistentModelID
-
-            if setRowIDs[id] == nil {
-                setRowIDs[id] = (0..<3).map { _ in UUID() }
-            }
-        }
-    }
-
-    private func replaceExercise(
-        _ oldExercise: Exercise,
-        with newExercise: Exercise
-    ) {
-        guard !selectedExercises.contains(where: {
-            $0.persistentModelID == newExercise.persistentModelID
-        }) else {
-            return
-        }
-
-        guard let index = selectedExercises.firstIndex(where: {
-            $0.persistentModelID == oldExercise.persistentModelID
-        }) else {
-            return
-        }
-
-        let oldID = oldExercise.persistentModelID
-        let newID = newExercise.persistentModelID
-
-        let existingRows = setRowIDs[oldID] ?? (0..<3).map { _ in UUID() }
-
-        selectedExercises[index] = newExercise
-
-        setRowIDs[newID] = existingRows
-        setRowIDs.removeValue(forKey: oldID)
-    }
-
-    private func addSet(for exercise: Exercise) {
-        let id = exercise.persistentModelID
-
-        setRowIDs[id, default: []].append(UUID())
-    }
-
-    private func removeSet(
-        for exercise: Exercise,
-        rowID: UUID
-    ) {
-        let id = exercise.persistentModelID
-
-        guard let rows = setRowIDs[id],
-              rows.count > 1 else {
-            return
-        }
-
-        setRowIDs[id]?.removeAll { $0 == rowID }
-    }
-
-    private func removeExercise(_ exercise: Exercise) {
-        let id = exercise.persistentModelID
-
-        selectedExercises.removeAll {
-            $0.persistentModelID == id
-        }
-
-        setRowIDs.removeValue(forKey: id)
-    }
-
     private func saveRoutine() {
-        let savedRoutine: Routine
-
-        if let routine {
-            savedRoutine = routine
-            savedRoutine.name = trimmedName
-        } else {
-            let nextOrder = (routines.map(\.sortOrder).max() ?? -1) + 1
-
-            savedRoutine = Routine(
-                name: trimmedName,
-                sortOrder: nextOrder
-            )
-
-            modelContext.insert(savedRoutine)
-        }
-
-        let existingLinks = savedRoutine.exercises
-
-        // Remove exercise associations that are no longer selected.
-        for link in existingLinks {
-            let isStillSelected = selectedExercises.contains {
-                $0.persistentModelID == link.exercise.persistentModelID
-            }
-
-            if !isStillSelected {
-                modelContext.delete(link)
-            }
-        }
-
-        // Update existing associations or create new ones.
-        for (index, exercise) in selectedExercises.enumerated() {
-            let setCount = setRowIDs[
-                exercise.persistentModelID,
-                default: (0..<3).map { _ in UUID() }
-            ].count
-
-            if let existingLink = existingLinks.first(where: {
-                $0.exercise.persistentModelID == exercise.persistentModelID
-            }) {
-                existingLink.order = index
-                existingLink.plannedSets = max(1, setCount)
-            } else {
-                let newLink = RoutineExercise(
-                    exercise: exercise,
-                    order: index,
-                    plannedSets: max(1, setCount)
-                )
-
-                newLink.routine = savedRoutine
-                modelContext.insert(newLink)
-            }
-        }
-
         do {
-            try modelContext.save()
+            try editor.save(in: modelContext, existingRoutines: routines)
             dismiss()
         } catch {
             print("Failed to save routine: \(error)")
         }
     }
+
 }
 
 #Preview {

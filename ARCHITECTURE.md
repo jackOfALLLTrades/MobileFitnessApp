@@ -34,7 +34,7 @@ All paths below are relative to `MobileFitnessApp/MobileFitnessApp`.
 - ActiveWorkoutView obtains the environment's model context and creates content with a persistent ActiveWorkoutViewModel. The view model owns weight/reps drafts, input parsing, workout mutations, and saving. It currently exposes SwiftUI bindings, so it intentionally depends on SwiftUI.
 - WorkoutSessionManager owns the app-wide active-session reference, minimized state, and restoration. It is not the owner of every workout database operation.
 - PreviousPerformanceLookup reads supplied history and formats previous values. It does not fetch or save data. It uses the latest earlier completed workout containing a matching exercise name; a missing set in that workout displays a dash.
-- RoutineEditorView still owns its draft editing and persistence. RoutineListView still creates sessions from routines. These are the next responsibility boundaries to extract.
+- RoutineEditorViewModel owns the routine name, selected exercises, planned set rows, validation, and saving. RoutineEditorView owns presentation and dismisses only after a successful save. RoutineListView still creates sessions from routines; this is the next responsibility boundary to extract.
 - HomeView still implements discard from the minimized banner. Consolidating it with active-workout discard is a future cleanup.
 
 ## Naming conventions
