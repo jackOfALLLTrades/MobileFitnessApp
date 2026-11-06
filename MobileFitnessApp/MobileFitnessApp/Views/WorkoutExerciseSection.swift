@@ -72,26 +72,7 @@ struct WorkoutExerciseSection: View {
             .listRowSeparator(.hidden)
 
             // Column headings
-            HStack(spacing: 8) {
-                Text("SET")
-                    .frame(width: 30, alignment: .center)
-                    .padding(.leading, 4)
-
-                Text("PREVIOUS")
-                    .frame(width: 82, alignment: .center)
-
-                Text("LBS")
-                    .frame(maxWidth: .infinity)
-
-                Text("REPS")
-                    .frame(maxWidth: .infinity)
-
-                Spacer()
-                    .frame(width: 28)
-            }
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(.secondary)
-            .listRowSeparator(.hidden)
+            SetColumnHeadings(style: .workout)
 
             // Individual set rows
             ForEach(

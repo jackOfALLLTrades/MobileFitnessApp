@@ -191,35 +191,11 @@ struct CreateRoutineView: View {
             .listRowSeparator(.hidden)
 
             // Column headings.
-            HStack(spacing: 12) {
-                Text("SET")
-                    .frame(width: 44, alignment: .leading)
-
-                Text("LBS")
-                    .frame(maxWidth: .infinity)
-
-                Text("REPS")
-                    .frame(maxWidth: .infinity)
-            }
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
-            .listRowSeparator(.hidden)
+            SetColumnHeadings(style: .routine)
 
             // Individual set rows.
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
-                HStack(spacing: 12) {
-                    Text("\(index + 1)")
-                        .font(.subheadline.weight(.medium))
-                        .frame(width: 44, alignment: .leading)
-
-                    Text("—")
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(.tertiary)
-
-                    Text("—")
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(.tertiary)
-                }
+                RoutineSetRow(number: index + 1)
                 .swipeActions(
                     edge: .trailing,
                     allowsFullSwipe: false

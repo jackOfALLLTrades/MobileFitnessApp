@@ -9,9 +9,17 @@ import SwiftUI
 import SwiftData
 
 struct ActiveWorkoutView: View {
+    @Environment(\.modelContext) private var modelContext
+    let session: WorkoutSession
+
+    var body: some View {
+        ActiveWorkoutContent(session: session, modelContext: modelContext)
+    }
+}
+
+private struct ActiveWorkoutContent: View {
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var workoutSessionManager: WorkoutSessionManager
 
     @Query(sort: \WorkoutSession.startDate, order: .reverse)
@@ -38,11 +46,11 @@ struct ActiveWorkoutView: View {
     @State private var exerciseBeingDeleted: SessionExercise?
     @State private var replacementTargetID: PersistentIdentifier?
 
-    @State private var weightDrafts: [PersistentIdentifier: String] = [:]
-    @State private var repsDrafts: [PersistentIdentifier: String] = [:]
+    @State private var workoutEditor: ActiveWorkoutViewModel
 
-    private var workoutEditor: ActiveWorkoutViewModel {
-        ActiveWorkoutViewModel(modelContext: modelContext)
+    init(session: WorkoutSession, modelContext: ModelContext) {
+        self.session = session
+        _workoutEditor = State(initialValue: ActiveWorkoutViewModel(modelContext: modelContext))
     }
 
     private var orderedExercises: [SessionExercise] {
@@ -65,25 +73,27 @@ struct ActiveWorkoutView: View {
                 WorkoutExerciseSection(
                     exercise: exercise,
                     previousPerformance: { setOrder in
-                        previousPerformance(
+                        WorkoutHistory().previousPerformance(
                             for: exercise,
-                            setOrder: setOrder
+                            setOrder: setOrder,
+                            before: session,
+                            in: workoutSessions
                         )
                     },
                     weightBinding: { workoutSet in
-                        weightBinding(for: workoutSet)
+                        workoutEditor.weightBinding(for: workoutSet)
                     },
                     repsBinding: { workoutSet in
-                        repsBinding(for: workoutSet)
+                        workoutEditor.repsBinding(for: workoutSet)
                     },
                     onToggleCompleted: { workoutSet in
                         workoutEditor.toggleCompleted(workoutSet)
                     },
                     onRemoveSet: { workoutSet in
-                        removeSet(workoutSet, from: exercise)
+                        workoutEditor.removeSet(workoutSet, from: exercise)
                     },
                     onAddSet: {
-                        addSet(to: exercise)
+                        workoutEditor.addSet(to: exercise)
                     },
                     onReorderExercises: {
                         prepareExerciseReordering()
@@ -217,7 +227,7 @@ struct ActiveWorkoutView: View {
         ) {
             Button("Delete Exercise", role: .destructive) {
                 if let exercise = exerciseBeingDeleted {
-                    deleteExercise(exercise)
+                    workoutEditor.deleteExercise(exercise, from: session)
                 }
 
                 exerciseBeingDeleted = nil
@@ -271,81 +281,12 @@ struct ActiveWorkoutView: View {
         .fontWeight(.semibold)
     }
 
-    // MARK: - Previous Performance
-
-    private func previousPerformance(
-        for exercise: SessionExercise,
-        setOrder: Int
-    ) -> String {
-
-        let previousSessions = workoutSessions
-            .filter {
-                $0.isCompleted &&
-                $0.startDate < session.startDate
-            }
-            .sorted {
-                $0.startDate > $1.startDate
-            }
-
-        for previousSession in previousSessions {
-            guard let previousExercise = previousSession.exercises.first(
-                where: {
-                    $0.exerciseName.caseInsensitiveCompare(
-                        exercise.exerciseName
-                    ) == .orderedSame
-                }
-            ) else {
-                continue
-            }
-
-            let previousSets = previousExercise.sets.sorted {
-                $0.order < $1.order
-            }
-
-            guard let previousSet = previousSets.first(
-                where: { $0.order == setOrder }
-            ) else {
-                return "—"
-            }
-
-            let weight = previousSet.weight.map {
-                formatNumber($0)
-            } ?? "—"
-
-            let reps = previousSet.reps.map {
-                String($0)
-            } ?? "—"
-
-            if previousSet.weight == nil && previousSet.reps == nil {
-                return "—"
-            }
-
-            return "\(weight) × \(reps)"
-        }
-
-        return "—"
-    }
-
-    private func formatNumber(_ value: Double) -> String {
-        if value.rounded() == value {
-            return String(Int(value))
-        }
-
-        return String(value)
-    }
-
     // MARK: - Exercise Management
 
     private func prepareExerciseSelection() {
-        let existingNames = Set(
-            session.exercises.map {
-                $0.exerciseName.lowercased()
-            }
+        selectedExercises = workoutEditor.selectedExercises(
+            in: session, from: availableExercises
         )
-
-        selectedExercises = availableExercises.filter {
-            existingNames.contains($0.name.lowercased())
-        }
 
         showingExerciseSelection = true
     }
@@ -378,107 +319,20 @@ struct ActiveWorkoutView: View {
             return
         }
 
-        let existingNames = Set(
-            session.exercises.map {
-                $0.exerciseName.lowercased()
-            }
+        selectedExercises = workoutEditor.selectedExercises(
+            in: session, from: availableExercises
         )
-
-        selectedExercises = availableExercises.filter {
-            existingNames.contains($0.name.lowercased())
-        }
 
         exerciseBeingReplaced = exercise
         replacementTargetID = targetExercise.persistentModelID
         showingReplacementSelection = true
     }
 
-    private func deleteExercise(_ exercise: SessionExercise) {
-        for workoutSet in exercise.sets {
-            clearDrafts(for: workoutSet)
-        }
-        workoutEditor.deleteExercise(exercise, from: session)
-    }
-
-    // MARK: - Text Field Bindings
-
-    private func weightBinding(
-        for workoutSet: WorkoutSet
-    ) -> Binding<String> {
-
-        let id = workoutSet.persistentModelID
-
-        return Binding(
-            get: {
-                weightDrafts[id] ??
-                workoutSet.weight.map { String($0) } ?? ""
-            },
-            set: { newValue in
-                weightDrafts[id] = newValue
-
-                let normalizedValue = newValue.replacingOccurrences(
-                    of: ",",
-                    with: "."
-                )
-
-                if normalizedValue.isEmpty {
-                    workoutSet.weight = nil
-                } else if let value = Double(normalizedValue) {
-                    workoutSet.weight = value
-                }
-
-                saveChanges()
-            }
-        )
-    }
-
-    private func repsBinding(
-        for workoutSet: WorkoutSet
-    ) -> Binding<String> {
-
-        let id = workoutSet.persistentModelID
-
-        return Binding(
-            get: {
-                repsDrafts[id] ??
-                workoutSet.reps.map { String($0) } ?? ""
-            },
-            set: { newValue in
-                repsDrafts[id] = newValue
-                workoutSet.reps = Int(newValue)
-                saveChanges()
-            }
-        )
-    }
-
-    // MARK: - Set Management
-
-    private func addSet(to exercise: SessionExercise) {
-        workoutEditor.addSet(to: exercise)
-    }
-
-    private func removeSet(
-        _ workoutSet: WorkoutSet,
-        from exercise: SessionExercise
-    ) {
-        guard exercise.sets.count > 1 else { return }
-        clearDrafts(for: workoutSet)
-        workoutEditor.removeSet(workoutSet, from: exercise)
-    }
-
-    private func clearDrafts(for workoutSet: WorkoutSet) {
-        weightDrafts.removeValue(forKey: workoutSet.persistentModelID)
-        repsDrafts.removeValue(forKey: workoutSet.persistentModelID)
-    }
-
     // MARK: - Workout Actions
 
     private func finishWorkout() {
-        session.endDate = Date()
-        session.isCompleted = true
-
         do {
-            try modelContext.save()
+            try workoutEditor.finishWorkout(session)
             workoutSessionManager.clearSession()
             dismiss()
         } catch {
@@ -487,10 +341,8 @@ struct ActiveWorkoutView: View {
     }
 
     private func discardWorkout() {
-        modelContext.delete(session)
-
         do {
-            try modelContext.save()
+            try workoutEditor.discardWorkout(session)
             workoutSessionManager.clearSession()
             dismiss()
         } catch {
@@ -498,13 +350,6 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    private func saveChanges() {
-        do {
-            try modelContext.save()
-        } catch {
-            print("Failed to save workout: \(error)")
-        }
-    }
 }
 
 #Preview {

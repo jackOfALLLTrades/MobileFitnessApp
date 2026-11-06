@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct WorkoutSetRow: View {
 
@@ -19,32 +18,29 @@ struct WorkoutSetRow: View {
     let onToggleCompleted: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
+        SetRowLayout(style: .workout) {
 
             Text("\(workoutSet.order + 1)")
                 .font(.subheadline.weight(.medium))
-                .frame(width: 30, alignment: .center)
-                .padding(.leading, 4)
+        } previous: {
 
             Text(previousPerformance)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
-                .frame(width: 82, alignment: .center)
+        } weight: {
 
             TextField("—", text: $weightText)
                 .keyboardType(.decimalPad)
                 .textFieldStyle(.roundedBorder)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-
+        } reps: {
             TextField("—", text: $repsText)
                 .keyboardType(.numberPad)
                 .textFieldStyle(.roundedBorder)
                 .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-
+        } completion: {
             Button(action: onToggleCompleted) {
                 Image(
                     systemName: workoutSet.isCompleted
@@ -57,7 +53,6 @@ struct WorkoutSetRow: View {
                 )
             }
             .buttonStyle(.plain)
-            .frame(width: 28)
             .accessibilityLabel(
                 workoutSet.isCompleted
                     ? "Mark set incomplete"
