@@ -7,7 +7,7 @@ For new Swift files, follow the existing seven-line comment header so imports/co
 //  FileName.swift
 //  MobileFitnessApp
 //
-//  Created by Brooks Coleman on M/D/YY.
+//  Created by [Group Member] on M/D/YY.
 //
 
 import SwiftUI
