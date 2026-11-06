@@ -43,69 +43,13 @@ struct RoutineListView: View {
 
                     ForEach(routines) { routine in
 
-                        VStack(alignment: .leading, spacing: 12) {
-
-                            HStack(alignment: .top) {
-
-                                VStack(alignment: .leading, spacing: 4) {
-
-                                    Text(routine.name)
-                                        .font(.headline)
-
-                                    Text("\(routine.exercises.count) exercises")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                Menu {
-
-                                    Button {
-                                        routineToEdit = routine
-                                    } label: {
-                                        Label(
-                                            "Edit Routine",
-                                            systemImage: "pencil"
-                                        )
-                                    }
-
-                                    Button(role: .destructive) {
-                                        deleteRoutine(routine)
-                                    } label: {
-                                        Label(
-                                            "Delete Routine",
-                                            systemImage: "trash"
-                                        )
-                                    }
-
-                                } label: {
-
-                                    Image(systemName: "ellipsis")
-                                        .font(.title3)
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 36, height: 36)
-                                        .contentShape(Rectangle())
-                                }
-                            }
-
-                            Button {
-                                startWorkout(from: routine)
-                            } label: {
-                                Label("Start Routine", systemImage: "play.fill")
-                                    .font(.subheadline.weight(.semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 11)
-                                    .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(.quaternary.opacity(0.5))
-                            )
-                            .disabled(workoutSessionManager.activeSession != nil)
-                        }
-                        .padding(.vertical, 8)
+                        RoutineCardView(
+                            routine: routine,
+                            canStart: workoutSessionManager.activeSession == nil,
+                            onEdit: { routineToEdit = routine },
+                            onDelete: { deleteRoutine(routine) },
+                            onStart: { startWorkout(from: routine) }
+                        )
                     }
                     .onMove(perform: moveRoutines)
                 }
@@ -166,43 +110,9 @@ struct RoutineListView: View {
             return
         }
 
-        let session = WorkoutSession(name: routine.name)
-
-        modelContext.insert(session)
-
-        let orderedExercises = routine.exercises.sorted {
-            $0.order < $1.order
-        }
-
-        for (exerciseIndex, routineExercise) in orderedExercises.enumerated() {
-
-            let workoutExercise = WorkoutExercise(
-                exerciseName: routineExercise.exercise.name,
-                order: exerciseIndex
-            )
-
-            workoutExercise.session = session
-            modelContext.insert(workoutExercise)
-
-            let plannedSetCount = max(1, routineExercise.plannedSets)
-
-            for setIndex in 0..<plannedSetCount {
-
-                let workoutSet = WorkoutSet(order: setIndex)
-                workoutSet.workoutExercise = workoutExercise
-
-                modelContext.insert(workoutSet)
-            }
-        }
-
         do {
-
-            try modelContext.save()
-
-            workoutSessionManager.beginSession(session)
-
+            try workoutSessionManager.startWorkout(from: routine, in: modelContext)
         } catch {
-
             print("Failed to start workout: \(error)")
         }
     }

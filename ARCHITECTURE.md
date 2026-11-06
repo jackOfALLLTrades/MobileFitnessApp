@@ -32,10 +32,11 @@ All paths below are relative to `MobileFitnessApp/MobileFitnessApp`.
 
 - Views own layout, navigation, sheets, and confirmation dialogs. SwiftData queries in views provide live collections.
 - ActiveWorkoutView obtains the environment's model context and creates content with a persistent ActiveWorkoutViewModel. The view model owns weight/reps drafts, input parsing, workout mutations, and saving. It currently exposes SwiftUI bindings, so it intentionally depends on SwiftUI.
-- WorkoutSessionManager owns the app-wide active-session reference, minimized state, and restoration. It is not the owner of every workout database operation.
+- WorkoutSessionManager coordinates lifecycle actions and owns the app-wide active-session reference and minimized state. It delegates persistence to WorkoutSessionService and updates app state only after saving succeeds. Its state is read-only to callers.
+- WorkoutSessionService creates sessions from routine snapshots, finishes and discards sessions, and fetches the latest unfinished session. It owns these database operations without depending on views or presentation state. ActiveWorkoutViewModel continues to own in-session logging and edits.
 - PreviousPerformanceLookup reads supplied history and formats previous values. It does not fetch or save data. It uses the latest earlier completed workout containing a matching exercise name; a missing set in that workout displays a dash.
-- RoutineEditorViewModel owns the routine name, selected exercises, planned set rows, validation, and saving. RoutineEditorView owns presentation and dismisses only after a successful save. RoutineListView still creates sessions from routines; this is the next responsibility boundary to extract.
-- HomeView still implements discard from the minimized banner. Consolidating it with active-workout discard is a future cleanup.
+- RoutineEditorViewModel owns the routine name, selected exercises, planned set rows, validation, and saving. RoutineEditorView owns presentation and dismisses only after a successful save. RoutineListView asks WorkoutSessionManager to start workouts from routines.
+- HomeView and ActiveWorkoutView use the same manager/service discard path. Views retain confirmation dialogs and dismiss only after successful lifecycle operations.
 
 ## Naming conventions
 
@@ -44,6 +45,7 @@ All paths below are relative to `MobileFitnessApp/MobileFitnessApp`.
 - Screens and visual components end in `View` or use a clear visual role such as `Row`, `Section`, or `Layout`.
 - Editors that support both creation and updates use `Editor`, not `Create`.
 - View models own screen editing state and actions. Small helpers describe their specific job, such as PreviousPerformanceLookup.
+- Use the existing Swift comment header, with imports/code starting on line 8 (see AGENTS.md).
 - Match a file's name to its primary type. Keep feature-specific components with their feature; move components to Shared only when multiple features use them.
 - Extract code when it establishes a clear responsibility or removes duplication. File length alone is not a reason to add another layer.
 

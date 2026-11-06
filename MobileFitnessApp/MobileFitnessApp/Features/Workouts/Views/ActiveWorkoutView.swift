@@ -19,6 +19,7 @@ struct ActiveWorkoutView: View {
 
 private struct ActiveWorkoutContent: View {
 
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var workoutSessionManager: WorkoutSessionManager
 
@@ -332,8 +333,7 @@ private struct ActiveWorkoutContent: View {
 
     private func finishWorkout() {
         do {
-            try workoutEditor.finishWorkout(session)
-            workoutSessionManager.clearSession()
+            try workoutSessionManager.finishWorkout(session, in: modelContext)
             dismiss()
         } catch {
             print("Failed to finish workout: \(error)")
@@ -342,8 +342,7 @@ private struct ActiveWorkoutContent: View {
 
     private func discardWorkout() {
         do {
-            try workoutEditor.discardWorkout(session)
-            workoutSessionManager.clearSession()
+            try workoutSessionManager.discardWorkout(session, in: modelContext)
             dismiss()
         } catch {
             print("Failed to discard workout: \(error)")

@@ -215,11 +215,8 @@ struct HomeView: View {
             return
         }
 
-        modelContext.delete(session)
-
         do {
-            try modelContext.save()
-            workoutSessionManager.clearSession()
+            try workoutSessionManager.discardWorkout(session, in: modelContext)
         } catch {
             print("Failed to cancel workout: \(error)")
         }

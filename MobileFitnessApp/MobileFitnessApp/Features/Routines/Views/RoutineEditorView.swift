@@ -63,7 +63,15 @@ struct RoutineEditorView: View {
                     editor.selectedExercises,
                     id: \.persistentModelID
                 ) { exercise in
-                    exerciseSection(for: exercise)
+                    RoutineExerciseSection(
+                        exercise: exercise,
+                        rows: editor.setRowIDs[exercise.persistentModelID] ?? [],
+                        onReorder: { activeSheet = .reorder },
+                        onReplace: { activeSheet = .replace(exercise, id: UUID()) },
+                        onDelete: { editor.removeExercise(exercise) },
+                        onRemoveSet: { editor.removeSet(for: exercise, rowID: $0) },
+                        onAddSet: { editor.addSet(for: exercise) }
+                    )
                 }
             }
         }
@@ -105,93 +113,6 @@ struct RoutineEditorView: View {
                 }
                 .disabled(!editor.isValid)
             }
-        }
-    }
-
-    private func exerciseSection(for exercise: Exercise) -> some View {
-        let id = exercise.persistentModelID
-        let rows = editor.setRowIDs[id] ?? []
-
-        return Section {
-            // Exercise name and management menu.
-            HStack {
-                Text(exercise.name)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-
-                Spacer()
-
-                Menu {
-                    Button {
-                        activeSheet = .reorder
-                    } label: {
-                        Label(
-                            "Reorder",
-                            systemImage: "arrow.up.arrow.down"
-                        )
-                    }
-
-                    Button {
-                        activeSheet = .replace(exercise, id: UUID())
-                    } label: {
-                        Label(
-                            "Replace Exercise",
-                            systemImage: "arrow.left.arrow.right"
-                        )
-                    }
-
-                    Divider()
-
-                    Button(role: .destructive) {
-                        editor.removeExercise(exercise)
-                    } label: {
-                        Label(
-                            "Delete Exercise",
-                            systemImage: "trash"
-                        )
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 36, height: 36)
-                        .contentShape(Rectangle())
-                }
-            }
-            .listRowSeparator(.hidden)
-
-            // Column headings.
-            SetColumnHeadings(style: .routine)
-
-            // Individual set rows.
-            ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
-                RoutineSetRow(number: index + 1)
-                .swipeActions(
-                    edge: .trailing,
-                    allowsFullSwipe: false
-                ) {
-                    if rows.count > 1 {
-                        Button(role: .destructive) {
-                            editor.removeSet(for: exercise, rowID: rowID)
-                        } label: {
-                            Label(
-                                "Remove Set",
-                                systemImage: "trash"
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Add set button.
-            Button {
-                editor.addSet(for: exercise)
-            } label: {
-                Label("Add Set", systemImage: "plus")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .listRowSeparator(.hidden)
         }
     }
 

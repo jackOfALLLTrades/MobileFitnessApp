@@ -1,3 +1,10 @@
+//
+//  ActiveWorkoutViewModel.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/5/26.
+//
+
 import SwiftUI
 import Observation
 import SwiftData
@@ -139,7 +146,7 @@ final class ActiveWorkoutViewModel {
         return Binding(
             get: {
                 self.weightDrafts[id] ??
-                workoutSet.weight.map { String($0) } ?? ""
+                workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0) } ?? ""
             },
             set: { newValue in
                 self.weightDrafts[id] = newValue
@@ -182,17 +189,6 @@ final class ActiveWorkoutViewModel {
     private func clearDrafts(for workoutSet: WorkoutSet) {
         weightDrafts.removeValue(forKey: workoutSet.persistentModelID)
         repsDrafts.removeValue(forKey: workoutSet.persistentModelID)
-    }
-
-    func finishWorkout(_ session: WorkoutSession) throws {
-        session.endDate = Date()
-        session.isCompleted = true
-        try modelContext.save()
-    }
-
-    func discardWorkout(_ session: WorkoutSession) throws {
-        modelContext.delete(session)
-        try modelContext.save()
     }
 
     func selectedExercises(

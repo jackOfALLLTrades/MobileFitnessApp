@@ -1,3 +1,10 @@
+//
+//  SetColumnHeadings.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/5/26.
+//
+
 import SwiftUI
 
 struct SetColumnHeadings: View {

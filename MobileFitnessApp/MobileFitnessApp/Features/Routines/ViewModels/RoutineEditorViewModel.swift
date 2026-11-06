@@ -1,3 +1,10 @@
+//
+//  RoutineEditorViewModel.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/5/26.
+//
+
 import Foundation
 import SwiftData
 import Observation

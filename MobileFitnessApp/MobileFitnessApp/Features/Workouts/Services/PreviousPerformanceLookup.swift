@@ -1,3 +1,10 @@
+//
+//  PreviousPerformanceLookup.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/5/26.
+//
+
 import Foundation
 
 /// Resolves previous set values from the latest matching completed workout.
@@ -40,7 +47,7 @@ struct PreviousPerformanceLookup {
             }
 
             let weight = previousSet.weight.map {
-                formatNumber($0)
+                WorkoutWeightFormatter.string(from: $0)
             } ?? "—"
 
             let reps = previousSet.reps.map {
@@ -55,13 +62,5 @@ struct PreviousPerformanceLookup {
         }
 
         return "—"
-    }
-
-    private func formatNumber(_ value: Double) -> String {
-        if value.rounded() == value {
-            return String(Int(value))
-        }
-
-        return String(value)
     }
 }
