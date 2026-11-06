@@ -102,7 +102,8 @@ struct CreateRoutineView: View {
                 switch sheet {
                 case .reorder:
                     ReorderExercisesView(
-                        exercises: $selectedExercises
+                        exercises: $selectedExercises,
+                        exerciseName: { exercise in exercise.name }
                     )
 
                 case .replace(let exercise, _):

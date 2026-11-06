@@ -7,15 +7,18 @@
 
 import SwiftUI
 
-struct ReorderExercisesView: View {
+struct ReorderExercisesView<Item: Identifiable>: View {
+
     @Environment(\.dismiss) private var dismiss
 
-    @Binding var exercises: [Exercise]
+    @Binding var exercises: [Item]
+
+    let exerciseName: (Item) -> String
 
     var body: some View {
         List {
             ForEach(exercises) { exercise in
-                Text(exercise.name)
+                Text(exerciseName(exercise))
                     .padding(.vertical, 6)
             }
             .onMove(perform: moveExercises)
