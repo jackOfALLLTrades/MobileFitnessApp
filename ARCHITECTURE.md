@@ -38,6 +38,9 @@ All paths below are relative to `MobileFitnessApp/MobileFitnessApp`.
 - RoutineEditorViewModel owns the routine name, selected exercises, planned set rows, validation, and saving. RoutineEditorView owns presentation and dismisses only after a successful save. RoutineListView asks WorkoutSessionManager to start workouts from routines.
 - HomeView and ActiveWorkoutView use the same manager/service discard path. Views retain confirmation dialogs and dismiss only after successful lifecycle operations.
 
+- ExerciseSelectionViewModel owns uncommitted picker selection, search/sort preferences, and duplicate replacement checks. ExerciseSelectionView owns committing selection, navigation, and library deletion. ExerciseBrowser shares filtering between the library and picker and groups picker results.
+- MinimizedWorkoutBanner owns banner layout; HomeView supplies reopen/discard actions. WorkoutDurationFormatter supplies the same elapsed-time text to the banner and workout header.
+
 ## Naming conventions
 
 - Domain models use nouns: Exercise, Routine, WorkoutSession, WorkoutExercise, WorkoutSet.

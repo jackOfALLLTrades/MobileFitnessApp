@@ -18,14 +18,7 @@ struct ExerciseLibraryView: View {
     @State private var showingAddExercise = false
 
     private var filteredExercises: [Exercise] {
-        guard !searchText.isEmpty else {
-            return exercises
-        }
-
-        return exercises.filter {
-            $0.name.localizedStandardContains(searchText) ||
-            ($0.muscleGroup?.localizedStandardContains(searchText) ?? false)
-        }
+        ExerciseBrowser.filtered(exercises, searchText: searchText)
     }
 
     var body: some View {

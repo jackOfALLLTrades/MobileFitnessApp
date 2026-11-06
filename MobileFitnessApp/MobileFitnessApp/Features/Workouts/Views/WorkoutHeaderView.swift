@@ -18,7 +18,7 @@ struct WorkoutHeaderView: View {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     VStack(alignment: .leading, spacing: 3) {
                         Text(
-                            elapsedTime(
+                            WorkoutDurationFormatter.string(
                                 since: startDate,
                                 now: context.date
                             )
@@ -45,26 +45,5 @@ struct WorkoutHeaderView: View {
             .padding(.vertical, 4)
             .listRowSeparator(.hidden)
         }
-    }
-
-    private func elapsedTime(
-        since startDate: Date,
-        now: Date
-    ) -> String {
-        let totalSeconds = max(
-            0,
-            Int(now.timeIntervalSince(startDate))
-        )
-
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-
-        return String(
-            format: "%02d:%02d:%02d",
-            hours,
-            minutes,
-            seconds
-        )
     }
 }
