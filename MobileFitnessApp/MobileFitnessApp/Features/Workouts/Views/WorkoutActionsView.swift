@@ -1,5 +1,5 @@
 //
-//  WorkoutActions.swift
+//  WorkoutActionsView.swift
 //  MobileFitnessApp
 //
 //  Created by Brooks Coleman on 11/5/26.

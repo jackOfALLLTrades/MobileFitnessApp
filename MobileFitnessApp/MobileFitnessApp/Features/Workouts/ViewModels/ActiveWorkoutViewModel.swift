@@ -33,16 +33,16 @@ final class ActiveWorkoutViewModel {
         var nextOrder = (session.exercises.map(\.order).max() ?? -1) + 1
 
         for exercise in newExercises {
-            let sessionExercise = SessionExercise(
+            let workoutExercise = WorkoutExercise(
                 exerciseName: exercise.name,
                 order: nextOrder
             )
 
-            sessionExercise.session = session
-            modelContext.insert(sessionExercise)
+            workoutExercise.session = session
+            modelContext.insert(workoutExercise)
 
             let firstSet = WorkoutSet(order: 0)
-            firstSet.sessionExercise = sessionExercise
+            firstSet.workoutExercise = workoutExercise
             modelContext.insert(firstSet)
 
             nextOrder += 1
@@ -51,7 +51,7 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
-    func saveExerciseOrder(_ exercisesToReorder: [SessionExercise]) {
+    func saveExerciseOrder(_ exercisesToReorder: [WorkoutExercise]) {
         for (index, exercise) in exercisesToReorder.enumerated() {
             exercise.order = index
         }
@@ -59,7 +59,7 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
-    func deleteExercise(_ exercise: SessionExercise, from session: WorkoutSession) {
+    func deleteExercise(_ exercise: WorkoutExercise, from session: WorkoutSession) {
         let remainingExercises = session.exercises.sorted { $0.order < $1.order }.filter {
             $0.persistentModelID != exercise.persistentModelID
         }
@@ -76,11 +76,11 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
-    func addSet(to exercise: SessionExercise) {
+    func addSet(to exercise: WorkoutExercise) {
         let nextOrder = (exercise.sets.map(\.order).max() ?? -1) + 1
 
         let workoutSet = WorkoutSet(order: nextOrder)
-        workoutSet.sessionExercise = exercise
+        workoutSet.workoutExercise = exercise
         modelContext.insert(workoutSet)
 
         saveChanges()
@@ -88,7 +88,7 @@ final class ActiveWorkoutViewModel {
 
     func removeSet(
         _ workoutSet: WorkoutSet,
-        from exercise: SessionExercise
+        from exercise: WorkoutExercise
     ) {
         let remainingSets = exercise.sets
             .filter {
@@ -117,7 +117,7 @@ final class ActiveWorkoutViewModel {
         saveChanges()
     }
 
-    func replaceExercise(_ exercise: SessionExercise, with replacement: Exercise) {
+    func replaceExercise(_ exercise: WorkoutExercise, with replacement: Exercise) {
         exercise.exerciseName = replacement.name
         saveChanges()
     }

@@ -15,7 +15,7 @@ final class WorkoutSet {
     var isCompleted: Bool
     var order: Int = 0
 
-    var sessionExercise: SessionExercise?
+    var workoutExercise: WorkoutExercise?
 
     init(
         weight: Double? = nil,

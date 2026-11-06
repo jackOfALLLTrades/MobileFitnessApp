@@ -15,8 +15,8 @@ final class WorkoutSession {
     var endDate: Date?
     var isCompleted: Bool
 
-    @Relationship(deleteRule: .cascade, inverse: \SessionExercise.session)
-    var exercises: [SessionExercise] = []
+    @Relationship(deleteRule: .cascade, inverse: \WorkoutExercise.session)
+    var exercises: [WorkoutExercise] = []
 
     init(name: String, startDate: Date = Date()) {
         self.name = name

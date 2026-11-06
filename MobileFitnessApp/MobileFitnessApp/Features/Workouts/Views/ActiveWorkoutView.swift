@@ -40,10 +40,10 @@ private struct ActiveWorkoutContent: View {
     @State private var showingSettingsMessage = false
 
     @State private var selectedExercises: [Exercise] = []
-    @State private var exercisesToReorder: [SessionExercise] = []
+    @State private var exercisesToReorder: [WorkoutExercise] = []
 
-    @State private var exerciseBeingReplaced: SessionExercise?
-    @State private var exerciseBeingDeleted: SessionExercise?
+    @State private var exerciseBeingReplaced: WorkoutExercise?
+    @State private var exerciseBeingDeleted: WorkoutExercise?
     @State private var replacementTargetID: PersistentIdentifier?
 
     @State private var workoutEditor: ActiveWorkoutViewModel
@@ -53,7 +53,7 @@ private struct ActiveWorkoutContent: View {
         _workoutEditor = State(initialValue: ActiveWorkoutViewModel(modelContext: modelContext))
     }
 
-    private var orderedExercises: [SessionExercise] {
+    private var orderedExercises: [WorkoutExercise] {
         session.exercises.sorted { $0.order < $1.order }
     }
 
@@ -73,7 +73,7 @@ private struct ActiveWorkoutContent: View {
                 WorkoutExerciseSection(
                     exercise: exercise,
                     previousPerformance: { setOrder in
-                        WorkoutHistory().previousPerformance(
+                        PreviousPerformanceLookup().previousPerformance(
                             for: exercise,
                             setOrder: setOrder,
                             before: session,
@@ -306,7 +306,7 @@ private struct ActiveWorkoutContent: View {
     }
 
     private func prepareExerciseReplacement(
-        for exercise: SessionExercise
+        for exercise: WorkoutExercise
     ) {
         guard let targetExercise = availableExercises.first(
             where: {
@@ -362,7 +362,7 @@ private struct ActiveWorkoutContent: View {
     .modelContainer(for: [
         Exercise.self,
         WorkoutSession.self,
-        SessionExercise.self,
+        WorkoutExercise.self,
         WorkoutSet.self
     ])
 }

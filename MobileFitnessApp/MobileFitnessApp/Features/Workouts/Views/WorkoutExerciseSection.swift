@@ -10,7 +10,7 @@ import SwiftData
 
 struct WorkoutExerciseSection: View {
 
-    let exercise: SessionExercise
+    let exercise: WorkoutExercise
 
     let previousPerformance: (Int) -> String
 

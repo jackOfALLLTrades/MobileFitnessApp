@@ -1,9 +1,9 @@
 import Foundation
 
 /// Resolves previous set values from the latest matching completed workout.
-struct WorkoutHistory {
+struct PreviousPerformanceLookup {
     func previousPerformance(
-        for exercise: SessionExercise,
+        for exercise: WorkoutExercise,
         setOrder: Int,
         before session: WorkoutSession,
         in workoutSessions: [WorkoutSession]

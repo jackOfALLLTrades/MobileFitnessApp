@@ -1,5 +1,5 @@
 //
-//  CreateRoutineView.swift
+//  RoutineEditorView.swift
 //  MobileFitnessApp
 //
 //  Created by Brooks Coleman on 11/4/26.
@@ -22,7 +22,7 @@ private enum RoutineEditorSheet: Identifiable {
     }
 }
 
-struct CreateRoutineView: View {
+struct RoutineEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
@@ -357,7 +357,7 @@ struct CreateRoutineView: View {
 
 #Preview {
     NavigationStack {
-        CreateRoutineView()
+        RoutineEditorView()
     }
     .modelContainer(for: [
         Exercise.self,

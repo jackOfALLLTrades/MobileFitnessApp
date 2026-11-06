@@ -116,7 +116,7 @@ struct RoutineListView: View {
                 ToolbarItem(placement: .topBarTrailing) {
 
                     NavigationLink {
-                        CreateRoutineView()
+                        RoutineEditorView()
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -125,7 +125,7 @@ struct RoutineListView: View {
             .sheet(item: $routineToEdit) { routine in
 
                 NavigationStack {
-                    CreateRoutineView(routine: routine)
+                    RoutineEditorView(routine: routine)
                 }
             }
         }
@@ -176,20 +176,20 @@ struct RoutineListView: View {
 
         for (exerciseIndex, routineExercise) in orderedExercises.enumerated() {
 
-            let sessionExercise = SessionExercise(
+            let workoutExercise = WorkoutExercise(
                 exerciseName: routineExercise.exercise.name,
                 order: exerciseIndex
             )
 
-            sessionExercise.session = session
-            modelContext.insert(sessionExercise)
+            workoutExercise.session = session
+            modelContext.insert(workoutExercise)
 
             let plannedSetCount = max(1, routineExercise.plannedSets)
 
             for setIndex in 0..<plannedSetCount {
 
                 let workoutSet = WorkoutSet(order: setIndex)
-                workoutSet.sessionExercise = sessionExercise
+                workoutSet.workoutExercise = workoutExercise
 
                 modelContext.insert(workoutSet)
             }
@@ -227,7 +227,7 @@ struct RoutineListView: View {
             Routine.self,
             RoutineExercise.self,
             WorkoutSession.self,
-            SessionExercise.self,
+            WorkoutExercise.self,
             WorkoutSet.self
         ])
 }
