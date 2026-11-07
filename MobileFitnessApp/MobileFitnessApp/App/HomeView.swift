@@ -37,13 +37,12 @@ struct HomeView: View {
                 }
                 .tag(1)
 
-            withWorkoutBanner(
-                NavigationStack {
-                    Text("Your workout history will appear here.")
-                        .foregroundStyle(.secondary)
-                        .navigationTitle("Profile")
+            withWorkoutBanner(WorkoutHistoryView())
+                .tabItem {
+                    Label("History", systemImage: "clock.arrow.circlepath")
                 }
-            )
+                .tag(2)
+            
             .tabItem {
                 Label("Profile", systemImage: "person")
             }
