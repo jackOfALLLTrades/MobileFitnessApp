@@ -120,6 +120,11 @@ private struct ActiveWorkoutContent: View {
                     }
                 )
             }
+            Section {
+                Text("Sets can be removed by swiping left.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
 
             // MARK: - Workout Actions
 
