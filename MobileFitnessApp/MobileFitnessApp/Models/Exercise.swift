@@ -4,18 +4,26 @@
 //
 //  Created by Kaden Brooks on 10/22/26.
 //
+
 import Foundation
+import SwiftData
 
-//A set can be rep based, or time based
-struct Set {
-    var reps: Int?
-    var time: String?
-    var weight: Int?
-}
-
-struct Exercise: Identifiable {
-    let id = UUID()
+@Model
+final class Exercise {
     var name: String
-    var sets: [Set]
-    var rest: [Int]
+    var muscleGroup: String?
+    var isBuiltIn: Bool = false
+
+    @Relationship(deleteRule: .cascade, inverse: \RoutineExercise.exercise)
+    var routineUsages: [RoutineExercise] = []
+
+    init(
+        name: String,
+        muscleGroup: String? = nil,
+        isBuiltIn: Bool = false
+    ) {
+        self.name = name
+        self.muscleGroup = muscleGroup
+        self.isBuiltIn = isBuiltIn
+    }
 }

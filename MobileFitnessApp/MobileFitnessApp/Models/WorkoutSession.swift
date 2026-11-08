@@ -1,0 +1,26 @@
+//
+//  WorkoutSession.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/4/26.
+//
+
+import Foundation
+import SwiftData
+
+@Model
+final class WorkoutSession {
+    var name: String
+    var startDate: Date
+    var endDate: Date?
+    var isCompleted: Bool
+
+    @Relationship(deleteRule: .cascade, inverse: \SessionExercise.session)
+    var exercises: [SessionExercise] = []
+
+    init(name: String, startDate: Date = Date()) {
+        self.name = name
+        self.startDate = startDate
+        self.isCompleted = false
+    }
+}
