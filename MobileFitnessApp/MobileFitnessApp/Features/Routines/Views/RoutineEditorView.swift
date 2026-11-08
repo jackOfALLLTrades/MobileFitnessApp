@@ -81,6 +81,11 @@ struct RoutineEditorView: View {
                         onAddSet: { editor.addSet(for: exercise) }
                     )
                 }
+                Section {
+                    Text("Sets can be removed by swiping left.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .sheet(item: $activeSheet) { sheet in

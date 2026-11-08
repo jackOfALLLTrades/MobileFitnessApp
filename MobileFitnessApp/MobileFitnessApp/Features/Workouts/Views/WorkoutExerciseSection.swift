@@ -70,7 +70,7 @@ struct WorkoutExerciseSection: View {
             }
             .listRowSeparator(.hidden)
 
-            SetColumnHeadings(style: .workout)
+            SetColumnHeadings(style: .workout, exerciseName: exercise.exerciseName)
 
             ForEach(
                 exercise.sets.sorted { $0.order < $1.order }

@@ -65,7 +65,7 @@ struct RoutineExerciseSection: View {
             }
             .listRowSeparator(.hidden)
 
-            SetColumnHeadings(style: .routine)
+            SetColumnHeadings(style: .routine, exerciseName: exercise.name)
 
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
                 RoutineSetRow(number: index + 1)

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SetColumnHeadings: View {
     let style: SetRowStyle
+    var exerciseName: String = ""
 
     var body: some View {
         SetRowLayout(style: style) {
@@ -18,7 +19,7 @@ struct SetColumnHeadings: View {
         } weight: {
             Text("LBS")
         } reps: {
-            Text("REPS")
+            Text(exerciseName == "Plank" ? "SECS" : "REPS")
         } completion: {
             Spacer()
         }
