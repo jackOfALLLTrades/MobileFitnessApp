@@ -14,7 +14,7 @@ struct WorkoutDetailView: View {
     private var exercises: [WorkoutExercise] {
         session.exercises
             .sorted {$0.order < $1.order }
-            .filter { !completedSets(for: $0).isEmpty }
+            .filter { !completedSets(for: $0).isEmpty || !notes(for: $0).isEmpty }
     }
     
     var body: some View {
@@ -33,7 +33,7 @@ struct WorkoutDetailView: View {
                 }
             }
             
-            if exercises.isEmpty {
+            if !exercises.contains(where: { !completedSets(for: $0).isEmpty }) {
                 Section {
                     Text("No sets were checked off in this workout.")
                         .foregroundStyle(.secondary)
@@ -42,6 +42,15 @@ struct WorkoutDetailView: View {
             
             ForEach(exercises) { exercise in
                 Section(exercise.exerciseName) {
+                    ForEach(notes(for: exercise)) { note in
+                        Label {
+                            Text(note.text)
+                        } icon: {
+                            Image(systemName: "note.text")
+                                .accessibilityHidden(true)
+                        }
+                    }
+
                     ForEach(
                         Array(completedSets(for: exercise).enumerated()),
                         id: \.element.persistentModelID
@@ -61,6 +70,12 @@ struct WorkoutDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
     
+    private func notes(for exercise: WorkoutExercise) -> [WorkoutExerciseNote] {
+        exercise.visibleNotes.filter {
+            !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+
     private func completedSets(for exercise: WorkoutExercise) -> [WorkoutSet] {
         exercise.sets
             .filter(\.isCompleted)

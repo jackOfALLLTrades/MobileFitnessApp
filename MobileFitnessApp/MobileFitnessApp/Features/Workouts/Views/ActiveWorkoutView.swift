@@ -85,6 +85,11 @@ private struct ActiveWorkoutContent: View {
             ForEach(orderedExercises) { exercise in
                 WorkoutExerciseSection(
                     exercise: exercise,
+                    previousNote: exercise.visibleNotes.first?.text.isEmpty == true
+                        ? previousNotes(for: exercise) : nil,
+                    noteBinding: { workoutEditor.noteBinding(for: $0, in: exercise) },
+                    onAddNote: { workoutEditor.addNote(to: exercise) },
+                    onRemoveNote: { workoutEditor.removeNote($0, from: exercise) },
                     previousPerformance: { setOrder in
                         PreviousPerformanceLookup().previousPerformance(
                             for: exercise,
@@ -347,6 +352,14 @@ private struct ActiveWorkoutContent: View {
     }
 
     // MARK: - Workout Actions
+
+    private func previousNotes(for exercise: WorkoutExercise) -> String? {
+        PreviousPerformanceLookup().previousNotes(
+            for: exercise,
+            before: session,
+            in: workoutSessions
+        )
+    }
 
     private func finishWorkout() {
         do {

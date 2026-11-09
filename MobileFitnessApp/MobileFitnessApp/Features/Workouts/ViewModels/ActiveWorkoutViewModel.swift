@@ -135,6 +135,10 @@ final class ActiveWorkoutViewModel {
 
     // Renaming the snapshot preserves this workout exercise's existing sets.
     func replaceExercise(_ exercise: WorkoutExercise, with replacement: Exercise) {
+        if exercise.exerciseName.caseInsensitiveCompare(replacement.name) != .orderedSame {
+            exercise.notes = nil
+            exercise.noteEntries = nil
+        }
         exercise.exerciseName = replacement.name
         saveChanges()
     }
@@ -150,6 +154,29 @@ final class ActiveWorkoutViewModel {
     }
 
     // MARK: - Input Bindings
+
+    func addNote(to exercise: WorkoutExercise) {
+        exercise.noteEntries = exercise.visibleNotes + [WorkoutExerciseNote()]
+        saveChanges()
+    }
+
+    func removeNote(_ id: UUID, from exercise: WorkoutExercise) {
+        exercise.noteEntries = exercise.visibleNotes.filter { $0.id != id }
+        saveChanges()
+    }
+
+    func noteBinding(for id: UUID, in exercise: WorkoutExercise) -> Binding<String> {
+        Binding(
+            get: { exercise.visibleNotes.first(where: { $0.id == id })?.text ?? "" },
+            set: { value in
+                var notes = exercise.visibleNotes
+                guard let index = notes.firstIndex(where: { $0.id == id }) else { return }
+                notes[index].text = value
+                exercise.noteEntries = notes
+                self.saveChanges()
+            }
+        )
+    }
 
     func weightBinding(
         for workoutSet: WorkoutSet

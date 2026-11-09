@@ -16,52 +16,66 @@ struct PreviousPerformanceLookup {
         in workoutSessions: [WorkoutSession]
     ) -> String {
 
-        let previousSessions = workoutSessions
-            .filter {
-                $0.isCompleted &&
-                $0.startDate < session.startDate
-            }
-            .sorted {
-                $0.startDate > $1.startDate
-            }
-
-        for previousSession in previousSessions {
-            guard let previousExercise = previousSession.exercises.first(
-                where: {
-                    $0.exerciseName.caseInsensitiveCompare(
-                        exercise.exerciseName
-                    ) == .orderedSame
-                }
-            ) else {
-                continue
-            }
-
-            let previousSets = previousExercise.sets.sorted {
-                $0.order < $1.order
-            }
-
-            // Use the latest matching workout only; missing sets do not fall back to older sessions.
-            guard let previousSet = previousSets.first(
-                where: { $0.order == setOrder }
-            ) else {
-                return "—"
-            }
-
-            let weight = previousSet.weight.map {
-                WorkoutWeightFormatter.string(from: $0)
-            } ?? "—"
-
-            let reps = previousSet.reps.map {
-                String($0)
-            } ?? "—"
-
-            if previousSet.weight == nil && previousSet.reps == nil {
-                return "—"
-            }
-
-            return "\(weight) × \(reps)"
+        guard let previousExercise = latestExercise(for: exercise, before: session, in: workoutSessions),
+              let previousSet = previousExercise.sets.sorted(by: { $0.order < $1.order })
+                .first(where: { $0.order == setOrder }) else {
+            return "—"
         }
 
-        return "—"
+        let weight = previousSet.weight.map {
+            WorkoutWeightFormatter.string(from: $0)
+        } ?? "—"
+
+        let reps = previousSet.reps.map {
+            String($0)
+        } ?? "—"
+
+        if previousSet.weight == nil && previousSet.reps == nil {
+            return "—"
+        }
+
+        return "\(weight) × \(reps)"
+    }
+
+    func previousNotes(
+        for exercise: WorkoutExercise,
+        before session: WorkoutSession,
+        in workoutSessions: [WorkoutSession]
+    ) -> String? {
+        let earlierSessions = workoutSessions
+            .filter { $0.isCompleted && $0.startDate < session.startDate }
+            .sorted { $0.startDate > $1.startDate }
+
+        for earlierSession in earlierSessions {
+            for match in earlierSession.exercises where
+                match.exerciseName.caseInsensitiveCompare(exercise.exerciseName) == .orderedSame {
+                if let note = match.visibleNotes.last(where: {
+                    !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                }) {
+                    return note.text
+                }
+            }
+        }
+        return nil
+    }
+
+    private func latestExercise(
+        for exercise: WorkoutExercise,
+        before session: WorkoutSession,
+        in workoutSessions: [WorkoutSession]
+    ) -> WorkoutExercise? {
+        let previousSessions = workoutSessions
+            .filter { $0.isCompleted && $0.startDate < session.startDate }
+            .sorted { $0.startDate > $1.startDate }
+
+        for previousSession in previousSessions {
+            if let match = previousSession.exercises.first(where: {
+                $0.exerciseName.caseInsensitiveCompare(exercise.exerciseName) == .orderedSame
+            }) {
+                return match
+            }
+        }
+
+        return nil
     }
 }
