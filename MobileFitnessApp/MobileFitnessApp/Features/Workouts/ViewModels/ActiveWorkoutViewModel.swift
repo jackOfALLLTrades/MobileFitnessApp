@@ -175,7 +175,7 @@ final class ActiveWorkoutViewModel {
                 } else if let value = Double(normalizedValue) {
                     workoutSet.weight = value
                 }
-
+                self.autoCompleteIfFilled(workoutSet)
                 self.saveChanges()
             }
         )
@@ -195,6 +195,7 @@ final class ActiveWorkoutViewModel {
             set: { newValue in
                 self.repsDrafts[id] = newValue
                 workoutSet.reps = Int(newValue)
+                self.autoCompleteIfFilled(workoutSet)
                 self.saveChanges()
             }
         )
@@ -211,5 +212,14 @@ final class ActiveWorkoutViewModel {
     ) -> [Exercise] {
         let existingNames = Set(session.exercises.map { $0.exerciseName.lowercased() })
         return availableExercises.filter { existingNames.contains($0.name.lowercased()) }
+    }
+    
+    private func autoCompleteIfFilled(_ workoutSet: WorkoutSet) {
+        let hasReps = (workoutSet.reps ?? 0) > 0
+        let hasWeight = workoutSet.weight != nil
+        
+        if hasReps && hasWeight {
+            workoutSet.isCompleted = true
+        }
     }
 }
