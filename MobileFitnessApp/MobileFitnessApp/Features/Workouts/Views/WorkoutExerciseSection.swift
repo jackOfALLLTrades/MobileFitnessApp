@@ -115,7 +115,7 @@ struct WorkoutExerciseSection: View {
                 }
             }
 
-            SetColumnHeadings(style: .workout, exerciseName: exercise.exerciseName)
+            SetColumnHeadings(style: .workout, loggingMode: exercise.loggingMode)
                 .themeListRow()
 
             ForEach(
@@ -123,6 +123,7 @@ struct WorkoutExerciseSection: View {
             ) { workoutSet in
                 WorkoutSetRow(
                     workoutSet: workoutSet,
+                    loggingMode: exercise.loggingMode,
                     previousPerformance: previousPerformance(
                         workoutSet.order
                     ),

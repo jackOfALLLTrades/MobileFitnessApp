@@ -12,17 +12,17 @@ struct SetColumnHeadings: View {
     private var weightUnit: WorkoutWeightUnit = .pounds
 
     let style: SetRowStyle
-    var exerciseName: String = ""
+    let loggingMode: ExerciseLoggingMode
 
     var body: some View {
-        SetRowLayout(style: style) {
+        SetRowLayout(style: style, showsWeight: loggingMode.showsWeight) {
             Text("SET")
         } previous: {
             Text("PREVIOUS")
         } weight: {
             Text(weightUnit == .pounds ? "LBS" : "KG")
         } reps: {
-            Text(exerciseName == "Plank" ? "SECS" : "REPS")
+            Text(loggingMode.countHeading)
         } completion: {
             Spacer()
         }

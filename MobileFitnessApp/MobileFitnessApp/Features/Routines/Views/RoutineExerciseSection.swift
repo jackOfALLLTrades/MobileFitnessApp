@@ -66,11 +66,11 @@ struct RoutineExerciseSection: View {
             .listRowSeparator(.hidden)
             .themeListRow()
 
-            SetColumnHeadings(style: .routine, exerciseName: exercise.name)
+            SetColumnHeadings(style: .routine, loggingMode: exercise.loggingMode)
                 .themeListRow()
 
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
-                RoutineSetRow(number: index + 1)
+                RoutineSetRow(number: index + 1, showsWeight: exercise.loggingMode.showsWeight)
                     .themeListRow()
                 .swipeActions(
                     edge: .trailing,

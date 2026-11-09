@@ -9,9 +9,10 @@ import SwiftUI
 
 struct RoutineSetRow: View {
     let number: Int
+    let showsWeight: Bool
 
     var body: some View {
-        SetRowLayout(style: .routine) {
+        SetRowLayout(style: .routine, showsWeight: showsWeight) {
             Text("\(number)")
                 .font(.subheadline.weight(.medium))
         } previous: {

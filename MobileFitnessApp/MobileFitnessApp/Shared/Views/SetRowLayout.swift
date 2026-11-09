@@ -21,6 +21,7 @@ enum SetRowStyle {
 
 struct SetRowLayout<Number: View, Previous: View, Weight: View, Reps: View, Completion: View>: View {
     let style: SetRowStyle
+    var showsWeight = true
     @ViewBuilder let number: () -> Number
     @ViewBuilder let previous: () -> Previous
     @ViewBuilder let weight: () -> Weight
@@ -38,7 +39,9 @@ struct SetRowLayout<Number: View, Previous: View, Weight: View, Reps: View, Comp
                     .frame(width: 82, alignment: .center)
             }
 
-            weight().frame(maxWidth: .infinity)
+            if showsWeight {
+                weight().frame(maxWidth: .infinity)
+            }
             reps().frame(maxWidth: .infinity)
 
             if style == .workout {

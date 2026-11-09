@@ -49,7 +49,8 @@ final class ActiveWorkoutViewModel {
         for exercise in newExercises {
             let workoutExercise = WorkoutExercise(
                 exerciseName: exercise.name,
-                order: nextOrder
+                order: nextOrder,
+                loggingMode: exercise.loggingMode
             )
 
             workoutExercise.session = session
@@ -140,6 +141,7 @@ final class ActiveWorkoutViewModel {
             exercise.noteEntries = nil
         }
         exercise.exerciseName = replacement.name
+        exercise.loggingMode = replacement.loggingMode
         saveChanges()
     }
 

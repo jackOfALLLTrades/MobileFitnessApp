@@ -29,7 +29,8 @@ struct WorkoutSessionService {
 
             let workoutExercise = WorkoutExercise(
                 exerciseName: routineExercise.exercise.name,
-                order: exerciseIndex
+                order: exerciseIndex,
+                loggingMode: routineExercise.exercise.loggingMode
             )
 
             workoutExercise.session = session

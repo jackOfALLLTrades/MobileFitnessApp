@@ -16,6 +16,7 @@ struct WorkoutHistoryView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.calendar) private var calendar
+    @Environment(\.tabBottomScrollMargin) private var tabBottomScrollMargin
     @Query private var sessions: [WorkoutSession]
     @State private var workoutToDelete: WorkoutSession?
     @State private var showingDeleteConfirmation = false
@@ -30,6 +31,10 @@ struct WorkoutHistoryView: View {
     }
 
     private let display: Display
+
+    private var bottomScrollMargin: CGFloat {
+        display == .profile ? tabBottomScrollMargin : 0
+    }
 
     init(display: Display = .fullHistory) {
         self.display = display
@@ -81,12 +86,14 @@ struct WorkoutHistoryView: View {
                         NavigationLink("View All Workouts") {
                             WorkoutHistoryView(display: .fullHistory)
                         }
+                        .themeListRow()
                     }
                 }
             } else {
                 workoutRows(sessions)
             }
         }
+        .contentMargins(.bottom, bottomScrollMargin, for: .scrollContent)
         .themeBackground()
         .navigationTitle(display == .profile ? "Profile" : "History")
         .confirmationDialog(

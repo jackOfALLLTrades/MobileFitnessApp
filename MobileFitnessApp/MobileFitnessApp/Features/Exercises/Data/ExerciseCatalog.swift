@@ -11,6 +11,7 @@ import SwiftData
 struct ExerciseDefinition {
     let name: String
     let muscleGroup: String
+    var loggingMode: ExerciseLoggingMode = .weighted
 }
 
 enum ExerciseCatalog {
@@ -23,8 +24,9 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Dumbbell Bench Press", muscleGroup: "Chest"),
         ExerciseDefinition(name: "Chest Fly", muscleGroup: "Chest"),
         ExerciseDefinition(name: "Cable Crossover", muscleGroup: "Chest"),
-        ExerciseDefinition(name: "Push-Up", muscleGroup: "Chest"),
-        ExerciseDefinition(name: "Incline Push-Up", muscleGroup: "Chest"),
+        ExerciseDefinition(name: "Push-Up", muscleGroup: "Chest", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Push-Up", muscleGroup: "Chest"),
+        ExerciseDefinition(name: "Incline Push-Up", muscleGroup: "Chest", loggingMode: .bodyweight),
         ExerciseDefinition(name: "Incline Dumbbell Bench Press", muscleGroup: "Chest"),
         ExerciseDefinition(name: "Dumbbell Fly", muscleGroup: "Chest"),
         ExerciseDefinition(name: "Cable Chest Press", muscleGroup: "Chest"),
@@ -33,11 +35,13 @@ enum ExerciseCatalog {
         // Back
         ExerciseDefinition(name: "Barbell Row", muscleGroup: "Back"),
         ExerciseDefinition(name: "Lat Pulldown", muscleGroup: "Back"),
-        ExerciseDefinition(name: "Pull-Up", muscleGroup: "Back"),
+        ExerciseDefinition(name: "Pull-Up", muscleGroup: "Back", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Pull-Up", muscleGroup: "Back"),
         ExerciseDefinition(name: "Seated Cable Row", muscleGroup: "Back"),
         ExerciseDefinition(name: "Deadlift", muscleGroup: "Back"),
-        ExerciseDefinition(name: "Chin-Up", muscleGroup: "Back"),
-        ExerciseDefinition(name: "Inverted Row", muscleGroup: "Back"),
+        ExerciseDefinition(name: "Chin-Up", muscleGroup: "Back", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Chin-Up", muscleGroup: "Back"),
+        ExerciseDefinition(name: "Inverted Row", muscleGroup: "Back", loggingMode: .bodyweight),
         ExerciseDefinition(name: "Single-Arm Dumbbell Row", muscleGroup: "Back"),
         ExerciseDefinition(name: "Straight-Arm Cable Pulldown", muscleGroup: "Back"),
         ExerciseDefinition(name: "Banded Row", muscleGroup: "Back"),
@@ -65,8 +69,9 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Tricep Pushdown", muscleGroup: "Triceps"),
         ExerciseDefinition(name: "Skull Crusher", muscleGroup: "Triceps"),
         ExerciseDefinition(name: "Overhead Tricep Extension", muscleGroup: "Triceps"),
-        ExerciseDefinition(name: "Dip", muscleGroup: "Triceps"),
-        ExerciseDefinition(name: "Close-Grip Push-Up", muscleGroup: "Triceps"),
+        ExerciseDefinition(name: "Dip", muscleGroup: "Triceps", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Dip", muscleGroup: "Triceps"),
+        ExerciseDefinition(name: "Close-Grip Push-Up", muscleGroup: "Triceps", loggingMode: .bodyweight),
         ExerciseDefinition(name: "Cable Overhead Tricep Extension", muscleGroup: "Triceps"),
         ExerciseDefinition(name: "Dumbbell Tricep Kickback", muscleGroup: "Triceps"),
         ExerciseDefinition(name: "Banded Tricep Pushdown", muscleGroup: "Triceps"),
@@ -79,8 +84,9 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Romanian Deadlift", muscleGroup: "Legs"),
         ExerciseDefinition(name: "Lunge", muscleGroup: "Legs"),
         ExerciseDefinition(name: "Calf Raise", muscleGroup: "Legs"),
-        ExerciseDefinition(name: "Bodyweight Squat", muscleGroup: "Legs"),
-        ExerciseDefinition(name: "Glute Bridge", muscleGroup: "Legs"),
+        ExerciseDefinition(name: "Bodyweight Squat", muscleGroup: "Legs", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Glute Bridge", muscleGroup: "Legs", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Glute Bridge", muscleGroup: "Legs"),
         ExerciseDefinition(name: "Goblet Squat", muscleGroup: "Legs"),
         ExerciseDefinition(name: "Dumbbell Romanian Deadlift", muscleGroup: "Legs"),
         ExerciseDefinition(name: "Dumbbell Bulgarian Split Squat", muscleGroup: "Legs"),
@@ -89,16 +95,23 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Banded Lateral Walk", muscleGroup: "Legs"),
 
         // Core
-        ExerciseDefinition(name: "Plank", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Crunch", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Hanging Leg Raise", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Reverse Crunch", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Lying Leg Raise", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Dead Bug", muscleGroup: "Core"),
+        ExerciseDefinition(name: "Plank", muscleGroup: "Core", loggingMode: .timed),
+        ExerciseDefinition(name: "Crunch", muscleGroup: "Core", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Weighted Crunch", muscleGroup: "Core"),
+        ExerciseDefinition(name: "Hanging Leg Raise", muscleGroup: "Core", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Reverse Crunch", muscleGroup: "Core", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Lying Leg Raise", muscleGroup: "Core", loggingMode: .bodyweight),
+        ExerciseDefinition(name: "Dead Bug", muscleGroup: "Core", loggingMode: .bodyweight),
         ExerciseDefinition(name: "Cable Crunch", muscleGroup: "Core"),
         ExerciseDefinition(name: "Cable Pallof Press", muscleGroup: "Core"),
         ExerciseDefinition(name: "Banded Pallof Press", muscleGroup: "Core")
     ]
+
+    static func loggingMode(for name: String) -> ExerciseLoggingMode {
+        builtInExercises.first {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }?.loggingMode ?? .weighted
+    }
 
     static func seed(into context: ModelContext) {
         do {
@@ -118,12 +131,14 @@ enum ExerciseCatalog {
                     // Recognize an existing matching exercise as built-in.
                     existingExercise.isBuiltIn = true
                     existingExercise.muscleGroup = definition.muscleGroup
+                    existingExercise.loggingMode = definition.loggingMode
                 } else {
                     // Insert the built-in exercise if it doesn't exist.
                     let exercise = Exercise(
                         name: definition.name,
                         muscleGroup: definition.muscleGroup,
-                        isBuiltIn: true
+                        isBuiltIn: true,
+                        loggingMode: definition.loggingMode
                     )
 
                     context.insert(exercise)

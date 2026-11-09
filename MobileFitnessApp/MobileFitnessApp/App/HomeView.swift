@@ -8,6 +8,10 @@
 import SwiftUI
 import SwiftData
 
+extension EnvironmentValues {
+    @Entry var tabBottomScrollMargin: CGFloat = 0
+}
+
 struct HomeView: View {
 
     // MARK: - Dependencies
@@ -80,22 +84,26 @@ struct HomeView: View {
     private func withWorkoutBanner<Content: View>(
         _ content: Content
     ) -> some View {
-        content.safeAreaInset(edge: .bottom, spacing: 0) {
-            if let session = workoutSessionManager.activeSession,
-               workoutSessionManager.isMinimized {
-                MinimizedWorkoutBanner(
-                    session: session,
-                    onReopen: {
-                        selectedTab = 1
-                        workoutSessionManager.reopenSession()
-                    },
-                    onDiscard: { showingCancelConfirmation = true }
-                )
+        let showsBanner = workoutSessionManager.activeSession != nil
+            && workoutSessionManager.isMinimized
+        return content
+            .environment(\.tabBottomScrollMargin, showsBanner ? 88 : 16)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if let session = workoutSessionManager.activeSession,
+                   showsBanner {
+                    MinimizedWorkoutBanner(
+                        session: session,
+                        onReopen: {
+                            selectedTab = 1
+                            workoutSessionManager.reopenSession()
+                        },
+                        onDiscard: { showingCancelConfirmation = true }
+                    )
                     .padding(.horizontal, 12)
                     .padding(.top, 8)
                     .padding(.bottom, 6)
+                }
             }
-        }
     }
 
     // MARK: - Workout Presentation

@@ -12,6 +12,7 @@ struct WorkoutSetRow: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let workoutSet: WorkoutSet
+    let loggingMode: ExerciseLoggingMode
     let previousPerformance: String
 
     @Binding var weightText: String
@@ -20,7 +21,7 @@ struct WorkoutSetRow: View {
     let onToggleCompleted: () -> Void
 
     var body: some View {
-        SetRowLayout(style: .workout) {
+        SetRowLayout(style: .workout, showsWeight: loggingMode.showsWeight) {
 
             Text("\(workoutSet.order + 1)")
                 .font(.subheadline.weight(.medium))

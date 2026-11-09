@@ -92,8 +92,8 @@ struct WorkoutDetailView: View {
     private func setText(_ workoutSet: WorkoutSet, for exercise: WorkoutExercise) -> String {
         let reps = workoutSet.reps.map(String.init) ?? "-"
         
-        if exercise.exerciseName == "Plank" {
-            return "\(reps) sec"
+        if !exercise.loggingMode.showsWeight {
+            return exercise.loggingMode == .timed ? "\(reps) sec" : "\(reps) reps"
         }
         
         let weight = workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0, unit: weightUnit) } ?? "-"

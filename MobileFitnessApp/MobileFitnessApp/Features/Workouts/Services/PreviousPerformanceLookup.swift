@@ -23,6 +23,11 @@ struct PreviousPerformanceLookup {
             return "—"
         }
 
+        if !exercise.loggingMode.showsWeight {
+            guard let count = previousSet.reps else { return "—" }
+            return exercise.loggingMode == .timed ? "\(count) sec" : "\(count) reps"
+        }
+
         let weight = previousSet.weight.map {
             WorkoutWeightFormatter.string(from: $0, unit: weightUnit)
         } ?? "—"

@@ -20,6 +20,7 @@ struct WorkoutCalendarView: View {
     @State private var selectedDate = Date()
 
     @Environment(\.calendar) private var calendar
+    @Environment(\.tabBottomScrollMargin) private var tabBottomScrollMargin
     @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
 
     var body: some View {
@@ -62,6 +63,7 @@ struct WorkoutCalendarView: View {
                 }
             }
         }
+        .contentMargins(.bottom, tabBottomScrollMargin, for: .scrollContent)
         .themeBackground()
     }
 

@@ -19,6 +19,24 @@ final class WorkoutExercise {
     var exerciseName: String
     var notes: String?
     var noteEntries: [WorkoutExerciseNote]?
+    var loggingModeValue: String?
+
+    var loggingMode: ExerciseLoggingMode {
+        get {
+            if let loggingModeValue,
+               let mode = ExerciseLoggingMode(rawValue: loggingModeValue) {
+                return mode
+            }
+
+            let catalogMode = ExerciseCatalog.loggingMode(for: exerciseName)
+            // Older bodyweight records may contain weight entered before reps-only logging.
+            if catalogMode == .bodyweight && sets.contains(where: { $0.weight != nil }) {
+                return .weighted
+            }
+            return catalogMode
+        }
+        set { loggingModeValue = newValue.rawValue }
+    }
 
     var visibleNotes: [WorkoutExerciseNote] {
         if let noteEntries { return noteEntries }
@@ -35,8 +53,9 @@ final class WorkoutExercise {
     @Relationship(deleteRule: .cascade, inverse: \WorkoutSet.workoutExercise)
     var sets: [WorkoutSet] = []
 
-    init(exerciseName: String, order: Int) {
+    init(exerciseName: String, order: Int, loggingMode: ExerciseLoggingMode? = nil) {
         self.exerciseName = exerciseName
         self.order = order
+        self.loggingModeValue = loggingMode?.rawValue
     }
 }
