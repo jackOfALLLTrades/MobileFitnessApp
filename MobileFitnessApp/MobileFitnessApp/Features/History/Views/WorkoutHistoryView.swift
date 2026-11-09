@@ -20,7 +20,14 @@ struct WorkoutHistoryView: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingDeleteError = false
 
-    private static let previewCount = 5
+    @AppStorage(AppPreferences.historyPreviewCountKey)
+    private var savedPreviewCount = AppPreferences.defaultHistoryPreviewCount
+
+    private var previewCount: Int {
+        AppPreferences.historyPreviewCounts.contains(savedPreviewCount)
+            ? savedPreviewCount : AppPreferences.defaultHistoryPreviewCount
+    }
+
     private let display: Display
 
     init(display: Display = .fullHistory) {
@@ -31,7 +38,7 @@ struct WorkoutHistoryView: View {
             sortBy: [SortDescriptor(\WorkoutSession.startDate, order: .reverse)]
         )
         if display == .profile {
-            descriptor.fetchLimit = Self.previewCount + 1
+            descriptor.fetchLimit = AppPreferences.defaultHistoryPreviewCount + 1
         }
         _sessions = Query(descriptor)
     }
@@ -42,6 +49,16 @@ struct WorkoutHistoryView: View {
         if display == .profile {
             NavigationStack {
                 historyList
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NavigationLink {
+                                SettingsView()
+                            } label: {
+                                Label("Settings", systemImage: "gearshape")
+                                    .labelStyle(.iconOnly)
+                            }
+                        }
+                    }
             }
         } else {
             historyList
@@ -52,9 +69,9 @@ struct WorkoutHistoryView: View {
         List {
             if display == .profile {
                 Section("History") {
-                    workoutRows(Array(sessions.prefix(Self.previewCount)))
+                    workoutRows(Array(sessions.prefix(previewCount)))
 
-                    if sessions.count > Self.previewCount {
+                    if sessions.count > previewCount {
                         NavigationLink("View All Workouts") {
                             WorkoutHistoryView(display: .fullHistory)
                         }

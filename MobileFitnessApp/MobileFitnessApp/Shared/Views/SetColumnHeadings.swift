@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SetColumnHeadings: View {
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
     let style: SetRowStyle
     var exerciseName: String = ""
 
@@ -17,7 +20,7 @@ struct SetColumnHeadings: View {
         } previous: {
             Text("PREVIOUS")
         } weight: {
-            Text("LBS")
+            Text(weightUnit == .pounds ? "LBS" : "KG")
         } reps: {
             Text(exerciseName == "Plank" ? "SECS" : "REPS")
         } completion: {

@@ -28,6 +28,9 @@ private struct ActiveWorkoutContent: View {
     @Query(sort: \WorkoutSession.startDate, order: .reverse)
     private var workoutSessions: [WorkoutSession]
 
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
     @Query(sort: \Exercise.name)
     private var availableExercises: [Exercise]
 
@@ -42,7 +45,7 @@ private struct ActiveWorkoutContent: View {
     @State private var showingReorderExercises = false
     @State private var showingDeleteExerciseConfirmation = false
     @State private var showingReplacementUnavailable = false
-    @State private var showingSettingsMessage = false
+    @State private var showingSettings = false
 
     @State private var selectedExercises: [Exercise] = []
     @State private var exercisesToReorder: [WorkoutExercise] = []
@@ -95,11 +98,12 @@ private struct ActiveWorkoutContent: View {
                             for: exercise,
                             setOrder: setOrder,
                             before: session,
-                            in: workoutSessions
+                            in: workoutSessions,
+                            weightUnit: weightUnit
                         )
                     },
                     weightBinding: { workoutSet in
-                        workoutEditor.weightBinding(for: workoutSet)
+                        workoutEditor.weightBinding(for: workoutSet, unit: weightUnit)
                     },
                     repsBinding: { workoutSet in
                         workoutEditor.repsBinding(for: workoutSet)
@@ -138,7 +142,7 @@ private struct ActiveWorkoutContent: View {
                     prepareExerciseSelection()
                 },
                 onSettings: {
-                    showingSettingsMessage = true
+                    showingSettings = true
                 },
                 onDiscard: {
                     showingDiscardConfirmation = true
@@ -213,6 +217,10 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
+        .navigationDestination(isPresented: $showingSettings) {
+            SettingsView()
+        }
+
         // MARK: - Confirmation Dialogs
 
         .confirmationDialog(
@@ -272,15 +280,6 @@ private struct ActiveWorkoutContent: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("This exercise could not be found in your exercise library, so it cannot be replaced.")
-        }
-
-        .alert(
-            "Workout Settings",
-            isPresented: $showingSettingsMessage
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Workout settings will be available in a future update.")
         }
     }
 

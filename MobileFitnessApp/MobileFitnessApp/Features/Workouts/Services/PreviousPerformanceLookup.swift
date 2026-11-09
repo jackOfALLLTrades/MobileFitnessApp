@@ -13,7 +13,8 @@ struct PreviousPerformanceLookup {
         for exercise: WorkoutExercise,
         setOrder: Int,
         before session: WorkoutSession,
-        in workoutSessions: [WorkoutSession]
+        in workoutSessions: [WorkoutSession],
+        weightUnit: WorkoutWeightUnit = .pounds
     ) -> String {
 
         guard let previousExercise = latestExercise(for: exercise, before: session, in: workoutSessions),
@@ -23,7 +24,7 @@ struct PreviousPerformanceLookup {
         }
 
         let weight = previousSet.weight.map {
-            WorkoutWeightFormatter.string(from: $0)
+            WorkoutWeightFormatter.string(from: $0, unit: weightUnit)
         } ?? "—"
 
         let reps = previousSet.reps.map {

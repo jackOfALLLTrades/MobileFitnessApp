@@ -9,6 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct WorkoutDetailView: View {
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
     let session: WorkoutSession
     
     private var exercises: [WorkoutExercise] {
@@ -89,8 +92,8 @@ struct WorkoutDetailView: View {
             return "\(reps) sec"
         }
         
-        let weight = workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0) } ?? "-"
-        return "\(weight) lb x \(reps)"
+        let weight = workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0, unit: weightUnit) } ?? "-"
+        return "\(weight) \(weightUnit.rawValue) x \(reps)"
     }
 }
 

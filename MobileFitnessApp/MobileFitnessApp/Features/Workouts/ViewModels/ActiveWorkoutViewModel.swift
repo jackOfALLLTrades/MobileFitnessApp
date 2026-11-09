@@ -16,7 +16,7 @@ final class ActiveWorkoutViewModel {
     // MARK: - Draft State and Dependencies
 
     // Keep partially typed values (such as "17.") intact while the numeric model is saved.
-    private var weightDrafts: [PersistentIdentifier: String] = [:]
+    private var weightDrafts: [PersistentIdentifier: (text: String, unit: WorkoutWeightUnit)] = [:]
     private var repsDrafts: [PersistentIdentifier: String] = [:]
 
     private let modelContext: ModelContext
@@ -179,18 +179,21 @@ final class ActiveWorkoutViewModel {
     }
 
     func weightBinding(
-        for workoutSet: WorkoutSet
+        for workoutSet: WorkoutSet,
+        unit: WorkoutWeightUnit
     ) -> Binding<String> {
 
         let id = workoutSet.persistentModelID
 
         return Binding(
             get: {
-                self.weightDrafts[id] ??
-                workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0) } ?? ""
+                if let draft = self.weightDrafts[id], draft.unit == unit {
+                    return draft.text
+                }
+                return workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0, unit: unit) } ?? ""
             },
             set: { newValue in
-                self.weightDrafts[id] = newValue
+                self.weightDrafts[id] = (newValue, unit)
 
                 let normalizedValue = newValue.replacingOccurrences(
                     of: ",",
@@ -200,7 +203,7 @@ final class ActiveWorkoutViewModel {
                 if normalizedValue.isEmpty {
                     workoutSet.weight = nil
                 } else if let value = Double(normalizedValue) {
-                    workoutSet.weight = value
+                    workoutSet.weight = unit.storedPounds(from: value)
                 }
 
                 self.saveChanges()
