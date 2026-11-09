@@ -1,0 +1,31 @@
+//
+//  WorkoutSet.swift
+//  MobileFitnessApp
+//
+//  Created by Brooks Coleman on 11/4/26.
+//
+
+import Foundation
+import SwiftData
+
+/// The entered weight, reps, and completion state for one workout set.
+@Model
+final class WorkoutSet {
+    var weight: Double?
+    var reps: Int?
+    var isCompleted: Bool
+    var order: Int = 0
+
+    var workoutExercise: WorkoutExercise?
+
+    init(
+        weight: Double? = nil,
+        reps: Int? = nil,
+        order: Int = 0
+    ) {
+        self.weight = weight
+        self.reps = reps
+        self.isCompleted = false
+        self.order = order
+    }
+}
