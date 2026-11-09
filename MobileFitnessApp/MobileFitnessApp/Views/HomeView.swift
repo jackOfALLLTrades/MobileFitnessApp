@@ -42,6 +42,12 @@ struct HomeView: View {
                 Label("Profile", systemImage: "person")
             }
             .tag(2)
+            //Added Calender view -- pending github style
+            withWorkoutBanner(CalendarView())
+                .tabItem {
+                    Label("Calendar", systemImage: "calendar")
+                }
+                .tag(3)
         }
         .fullScreenCover(isPresented: activeWorkoutPresentation) {
             if let session = workoutSessionManager.activeSession {
