@@ -19,32 +19,37 @@ struct WorkoutHistoryView: View {
     var body: some View {
         NavigationStack {
             List {
-                if sessions.isEmpty {
-                    ContentUnavailableView(
-                        "No Workouts Yet",
-                        systemImage: "clock.arrow.circlepath",
-                        description: Text("Finished workouts will show up here.")
-                    )
-                } else {
-                    ForEach(sessions) { session in
-                        NavigationLink {
-                            WorkoutDetailView(session: session)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(session.name)
-                                    .font(.headline)
-                                
-                                Text(session.startDate.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                
-                                Text("\(session.exercises.count) exercises")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                Section("Progress") {
+                    ExerciseProgressView()
+                }
+                Section("Previous Workouts") {
+                    if sessions.isEmpty {
+                        ContentUnavailableView(
+                            "No Workouts Yet",
+                            systemImage: "clock.arrow.circlepath",
+                            description: Text("Finished workouts will show up here.")
+                        )
+                    } else {
+                        ForEach(sessions) { session in
+                            NavigationLink {
+                                WorkoutDetailView(session: session)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(session.name)
+                                        .font(.headline)
+                                    
+                                    Text(session.startDate.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                    
+                                    Text("\(session.exercises.count) exercises")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 4)
                             }
-                            .padding(.vertical, 4)
-                        }
-                    } .navigationTitle("History")
+                        } .navigationTitle("History")
+                    }
                 }
             }
         }
