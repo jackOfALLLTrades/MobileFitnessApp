@@ -64,11 +64,14 @@ struct RoutineExerciseSection: View {
                 }
             }
             .listRowSeparator(.hidden)
+            .themeListRow()
 
             SetColumnHeadings(style: .routine, exerciseName: exercise.name)
+                .themeListRow()
 
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
                 RoutineSetRow(number: index + 1)
+                    .themeListRow()
                 .swipeActions(
                     edge: .trailing,
                     allowsFullSwipe: false
@@ -94,6 +97,7 @@ struct RoutineExerciseSection: View {
             }
             .buttonStyle(.bordered)
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 

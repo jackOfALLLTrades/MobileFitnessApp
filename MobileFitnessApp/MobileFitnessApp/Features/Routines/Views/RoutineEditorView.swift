@@ -29,6 +29,7 @@ struct RoutineEditorView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Query private var routines: [Routine]
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
 
     // MARK: - Editing and Presentation State
 
@@ -49,8 +50,8 @@ struct RoutineEditorView: View {
         Form {
             Section("Routine Information") {
                 TextField("Routine Name", text: $editor.routineName)
+                    .themeListRow()
             }
-            .themeListRow()
 
             Section {
                 NavigationLink {
@@ -60,13 +61,14 @@ struct RoutineEditorView: View {
                 } label: {
                     Label("Select Exercises", systemImage: "plus")
                 }
+                .themeListRow()
             }
-            .themeListRow()
 
             if editor.selectedExercises.isEmpty {
                 Section("Exercises") {
                     Text("No exercises selected.")
                         .foregroundStyle(.secondary)
+                        .themeListRow()
                 }
             } else {
                 ForEach(
@@ -87,9 +89,11 @@ struct RoutineEditorView: View {
                     Text("Sets can be removed by swiping left.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .themeListRow()
                 }
             }
         }
+        .themeBackground()
         .sheet(item: $activeSheet) { sheet in
             NavigationStack {
                 switch sheet {
@@ -113,7 +117,8 @@ struct RoutineEditorView: View {
             _, _ in
             editor.syncSetRows()
         }
-        .themeBackground()
+        .tint(theme.accent)
+        .preferredColorScheme(theme.colorScheme)
         .navigationTitle(isEditing ? "Edit Routine" : "New Routine")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

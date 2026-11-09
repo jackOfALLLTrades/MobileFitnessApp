@@ -39,6 +39,7 @@ private struct ActiveWorkoutContent: View {
     // MARK: - Presentation State
 
     @State private var showingFinishConfirmation = false
+    @State private var showingFinishError = false
     @State private var showingDiscardConfirmation = false
     @State private var showingExerciseSelection = false
     @State private var showingReplacementSelection = false
@@ -230,13 +231,26 @@ private struct ActiveWorkoutContent: View {
             isPresented: $showingFinishConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Finish Workout") {
-                finishWorkout()
+            if routineToUpdate != nil {
+                Button("Update Routine") {
+                    finishWorkout(updateRoutine: true)
+                }
+                Button("Finish Without Updating") {
+                    finishWorkout()
+                }
+            } else {
+                Button("Finish Workout") {
+                    finishWorkout()
+                }
             }
 
             Button("Keep Working", role: .cancel) {}
         } message: {
-            Text("Your workout will be saved to your history.")
+            if let routine = routineToUpdate {
+                Text("Save this workout to history and update the exercise lineup in \(routine.name)?")
+            } else {
+                Text("Your workout will be saved to your history.")
+            }
         }
 
         .confirmationDialog(
@@ -274,6 +288,12 @@ private struct ActiveWorkoutContent: View {
         }
 
         // MARK: - Alerts
+
+        .alert("Couldn’t Finish Workout", isPresented: $showingFinishError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Please try again.")
+        }
 
         .alert(
             "Exercise Unavailable",
@@ -362,11 +382,17 @@ private struct ActiveWorkoutContent: View {
         )
     }
 
-    private func finishWorkout() {
+    private var routineToUpdate: Routine? {
+        WorkoutSessionService(modelContext: modelContext)
+            .routineToUpdate(for: session, catalog: availableExercises)
+    }
+
+    private func finishWorkout(updateRoutine: Bool = false) {
         do {
-            try workoutSessionManager.finishWorkout(session, in: modelContext)
+            try workoutSessionManager.finishWorkout(session, in: modelContext, updateRoutine: updateRoutine)
             dismiss()
         } catch {
+            showingFinishError = true
             print("Failed to finish workout: \(error)")
         }
     }

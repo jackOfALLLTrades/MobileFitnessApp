@@ -15,6 +15,8 @@ final class WorkoutSession {
     var startDate: Date
     var endDate: Date?
     var isCompleted: Bool
+    var sourceRoutine: Routine?
+    var startingExerciseNames: [String]?
 
     @Relationship(deleteRule: .cascade, inverse: \WorkoutExercise.session)
     var exercises: [WorkoutExercise] = []
