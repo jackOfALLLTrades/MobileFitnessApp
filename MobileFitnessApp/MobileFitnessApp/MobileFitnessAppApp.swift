@@ -14,10 +14,20 @@ struct MobileFitnessAppApp: App {
     @StateObject private var workoutSessionManager =
         WorkoutSessionManager()
 
+    @State private var showSplash = true
+
     var body: some Scene {
         WindowGroup {
-            HomeView()
-                .environmentObject(workoutSessionManager)
+            ZStack {
+                HomeView()
+                    .environmentObject(workoutSessionManager)
+
+                if showSplash {
+                    SplashView {
+                        showSplash = false
+                    }
+                }
+            }
         }
         .modelContainer(for: [
             Exercise.self,
