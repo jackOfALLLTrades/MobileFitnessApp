@@ -39,14 +39,9 @@ struct HomeView: View {
 
             withWorkoutBanner(WorkoutHistoryView())
                 .tabItem {
-                    Label("History", systemImage: "clock.arrow.circlepath")
+                    Label("Profile", systemImage: "person")
                 }
                 .tag(2)
-            
-            .tabItem {
-                Label("Profile", systemImage: "person")
-            }
-            .tag(2)
         }
         .fullScreenCover(isPresented: activeWorkoutPresentation) {
             if let session = workoutSessionManager.activeSession {

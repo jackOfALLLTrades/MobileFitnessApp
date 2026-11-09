@@ -44,9 +44,10 @@ struct WorkoutHistoryView: View {
                             }
                             .padding(.vertical, 4)
                         }
-                    } .navigationTitle("History")
+                    }
                 }
             }
+            .navigationTitle("History")
         }
     }
 }
