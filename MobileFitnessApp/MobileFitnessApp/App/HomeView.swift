@@ -37,7 +37,7 @@ struct HomeView: View {
                 }
                 .tag(1)
 
-            withWorkoutBanner(WorkoutHistoryView())
+            withWorkoutBanner(WorkoutHistoryView(display: .profile))
                 .tabItem {
                     Label("Profile", systemImage: "person")
                 }
