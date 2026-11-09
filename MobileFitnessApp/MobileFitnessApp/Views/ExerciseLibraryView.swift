@@ -58,7 +58,7 @@ struct ExerciseLibraryView: View {
             }
         }
         .navigationTitle("Exercise Library")
-        .searchable(text: $searchText, prompt: "Search exercises")
+        .searchable(text: $searchText, prompt: "Search Exercises")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

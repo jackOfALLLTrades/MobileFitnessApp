@@ -59,7 +59,11 @@ enum ExerciseCatalog {
         // Core
         ExerciseDefinition(name: "Plank", muscleGroup: "Core"),
         ExerciseDefinition(name: "Crunch", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Hanging Leg Raise", muscleGroup: "Core")
+        ExerciseDefinition(name: "Hanging Leg Raise", muscleGroup: "Core"),
+        ExerciseDefinition(name: "Russian Twist", muscleGroup: "Core"),
+        ExerciseDefinition(name: "Dead Bug", muscleGroup: "Core"),
+        ExerciseDefinition(name: "Side Plank", muscleGroup: "Core")
+
     ]
 
     static func seed(into context: ModelContext) {
