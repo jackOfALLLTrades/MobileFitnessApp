@@ -47,9 +47,11 @@ struct ExerciseLibraryView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    .themeListRow()
                 }
             }
         }
+        .themeBackground()
         .navigationTitle("Exercise Library")
         .searchable(text: $searchText, prompt: "Search exercises")
         .toolbar {

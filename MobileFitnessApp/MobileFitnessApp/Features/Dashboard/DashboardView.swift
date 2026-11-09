@@ -23,6 +23,7 @@ struct DashboardView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .themeBackground()
             .navigationTitle("Home")
         }
     }

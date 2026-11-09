@@ -17,6 +17,8 @@ struct HomeView: View {
 
     // MARK: - Presentation State
 
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
     @State private var selectedTab = 0
     @State private var showingCancelConfirmation = false
 
@@ -48,6 +50,8 @@ struct HomeView: View {
                 NavigationStack {
                     ActiveWorkoutView(session: session)
                 }
+                .tint(theme.accent)
+                .preferredColorScheme(theme.colorScheme)
             }
         }
         .confirmationDialog(

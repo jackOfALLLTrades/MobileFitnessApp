@@ -56,10 +56,12 @@ struct RoutineListView: View {
                             onDelete: { deleteRoutine(routine) },
                             onStart: { startWorkout(from: routine) }
                         )
+                        .themeListRow()
                     }
                     .onMove(perform: moveRoutines)
                 }
             }
+            .themeBackground()
             .navigationTitle("Routines")
             .toolbar {
 

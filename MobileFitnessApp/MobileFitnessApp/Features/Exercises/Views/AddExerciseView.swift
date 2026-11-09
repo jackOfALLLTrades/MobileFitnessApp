@@ -39,6 +39,7 @@ struct AddExerciseView: View {
 
                     TextField("Muscle Group (Optional)", text: $muscleGroup)
                 }
+                .themeListRow()
 
                 if isDuplicate {
                     Section {
@@ -47,6 +48,7 @@ struct AddExerciseView: View {
                     }
                 }
             }
+            .themeBackground()
             .navigationTitle("New Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

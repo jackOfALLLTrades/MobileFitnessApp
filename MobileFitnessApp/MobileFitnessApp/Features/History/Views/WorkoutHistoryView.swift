@@ -81,6 +81,7 @@ struct WorkoutHistoryView: View {
                 workoutRows(sessions)
             }
         }
+        .themeBackground()
         .navigationTitle(display == .profile ? "Profile" : "History")
         .confirmationDialog(
             "Delete Workout?",
@@ -133,6 +134,7 @@ struct WorkoutHistoryView: View {
                     }
                     .padding(.vertical, 4)
                 }
+                .themeListRow()
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     // Reserve the destructive role for confirmation so the row stays visible.
                     Button {

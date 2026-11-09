@@ -11,6 +11,7 @@ enum AppPreferences {
     static let historyPreviewCountKey = "historyPreviewCount"
     static let historyPreviewCounts = 3...5
     static let defaultHistoryPreviewCount = 5
+    static let themeKey = "bodiesTheme"
     static let weightUnitKey = "workoutWeightUnit"
 }
 
@@ -21,6 +22,9 @@ struct SettingsView: View {
     @AppStorage(AppPreferences.weightUnitKey)
     private var weightUnit: WorkoutWeightUnit = .pounds
 
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+    @State private var showingThemePicker = false
+
     var body: some View {
         Form {
             Section("History") {
@@ -29,7 +33,10 @@ struct SettingsView: View {
                         Text("\(count)").tag(count)
                     }
                 }
+                .tint(theme.accent)
+                .id(theme)
             }
+            .themeListRow()
 
             Section("Workout Logging") {
                 Picker("Weight Units", selection: $weightUnit) {
@@ -37,8 +44,24 @@ struct SettingsView: View {
                         Text(unit.title).tag(unit)
                     }
                 }
+                .tint(theme.accent)
+                .id(theme)
             }
+            .themeListRow()
+
+            Section("Appearance") {
+                Button {
+                    showingThemePicker = true
+                } label: {
+                    LabeledContent("Theme", value: theme.rawValue)
+                }
+            }
+            .themeListRow()
         }
+        .themeBackground()
         .navigationTitle("Settings")
+        .sheet(isPresented: $showingThemePicker) {
+            ThemePickerView(theme: $theme)
+        }
     }
 }

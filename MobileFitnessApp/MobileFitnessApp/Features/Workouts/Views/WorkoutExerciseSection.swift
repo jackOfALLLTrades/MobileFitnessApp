@@ -83,6 +83,7 @@ struct WorkoutExerciseSection: View {
                 }
             }
             .listRowSeparator(.hidden)
+            .themeListRow()
 
             ForEach(exercise.visibleNotes) { note in
                 let showHint = note.id == exercise.visibleNotes.first?.id && focusedNote != note.id
@@ -103,6 +104,7 @@ struct WorkoutExerciseSection: View {
                 }
                 .font(.subheadline)
                 .listRowSeparator(.hidden)
+                .themeListRow()
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         if focusedNote == note.id { focusedNote = nil }
@@ -114,6 +116,7 @@ struct WorkoutExerciseSection: View {
             }
 
             SetColumnHeadings(style: .workout, exerciseName: exercise.exerciseName)
+                .themeListRow()
 
             ForEach(
                 exercise.sets.sorted { $0.order < $1.order }
@@ -129,6 +132,7 @@ struct WorkoutExerciseSection: View {
                         onToggleCompleted(workoutSet)
                     }
                 )
+                .themeListRow()
                 .swipeActions(
                     edge: .trailing,
                     allowsFullSwipe: false
@@ -156,6 +160,7 @@ struct WorkoutExerciseSection: View {
                     .fill(.quaternary.opacity(0.5))
             )
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 }

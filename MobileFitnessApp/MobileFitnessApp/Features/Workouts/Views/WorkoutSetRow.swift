@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct WorkoutSetRow: View {
+    @Environment(\.colorScheme) private var colorScheme
 
     let workoutSet: WorkoutSet
     let previousPerformance: String
@@ -31,15 +33,9 @@ struct WorkoutSetRow: View {
                 .minimumScaleFactor(0.75)
         } weight: {
 
-            TextField("—", text: $weightText)
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                .multilineTextAlignment(.center)
+            setInput($weightText, keyboard: .decimalPad)
         } reps: {
-            TextField("—", text: $repsText)
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-                .multilineTextAlignment(.center)
+            setInput($repsText, keyboard: .numberPad)
         } completion: {
             Button(action: onToggleCompleted) {
                 Image(
@@ -60,5 +56,22 @@ struct WorkoutSetRow: View {
             )
         }
         .padding(.vertical, 3)
+    }
+
+    @ViewBuilder
+    private func setInput(_ text: Binding<String>, keyboard: UIKeyboardType) -> some View {
+        let field = TextField("—", text: text)
+            .keyboardType(keyboard)
+            .multilineTextAlignment(.center)
+
+        if colorScheme == .dark {
+            field
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 6)
+                .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 6))
+        } else {
+            field.textFieldStyle(.roundedBorder)
+        }
     }
 }

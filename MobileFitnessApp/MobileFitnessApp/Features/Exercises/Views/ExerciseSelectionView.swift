@@ -72,6 +72,7 @@ struct ExerciseSelectionView: View {
                 }
             }
         }
+        .themeBackground()
         .navigationTitle(
             replacementTargetID == nil
                 ? "Select Exercises"
@@ -146,6 +147,7 @@ struct ExerciseSelectionView: View {
             )
         }
         .buttonStyle(.plain)
+        .themeListRow()
         .disabled(isAlreadySelectedElsewhere(exercise))
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if !exercise.isBuiltIn {

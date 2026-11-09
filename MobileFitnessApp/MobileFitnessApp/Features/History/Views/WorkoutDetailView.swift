@@ -35,12 +35,14 @@ struct WorkoutDetailView: View {
                     )
                 }
             }
+            .themeListRow()
             
             if !exercises.contains(where: { !completedSets(for: $0).isEmpty }) {
                 Section {
                     Text("No sets were checked off in this workout.")
                         .foregroundStyle(.secondary)
                 }
+                .themeListRow()
             }
             
             ForEach(exercises) { exercise in
@@ -67,8 +69,10 @@ struct WorkoutDetailView: View {
                         }
                     }
                 }
+                .themeListRow()
             }
         }
+        .themeBackground()
         .navigationTitle(session.name)
         .navigationBarTitleDisplayMode(.inline)
     }

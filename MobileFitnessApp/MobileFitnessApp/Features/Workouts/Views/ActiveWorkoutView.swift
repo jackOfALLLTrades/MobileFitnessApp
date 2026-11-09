@@ -133,6 +133,7 @@ private struct ActiveWorkoutContent: View {
                 Text("Sets can be removed by swiping left.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .themeListRow()
             }
 
             // MARK: - Workout Actions
@@ -149,6 +150,7 @@ private struct ActiveWorkoutContent: View {
                 }
             )
         }
+        .themeBackground()
         .navigationTitle(session.name)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

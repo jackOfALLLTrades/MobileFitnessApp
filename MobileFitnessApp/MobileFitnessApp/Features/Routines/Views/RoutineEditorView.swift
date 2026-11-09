@@ -50,6 +50,7 @@ struct RoutineEditorView: View {
             Section("Routine Information") {
                 TextField("Routine Name", text: $editor.routineName)
             }
+            .themeListRow()
 
             Section {
                 NavigationLink {
@@ -60,6 +61,7 @@ struct RoutineEditorView: View {
                     Label("Select Exercises", systemImage: "plus")
                 }
             }
+            .themeListRow()
 
             if editor.selectedExercises.isEmpty {
                 Section("Exercises") {
@@ -111,6 +113,7 @@ struct RoutineEditorView: View {
             _, _ in
             editor.syncSetRows()
         }
+        .themeBackground()
         .navigationTitle(isEditing ? "Edit Routine" : "New Routine")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
