@@ -15,6 +15,7 @@ struct WorkoutHistoryView: View {
     }
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.calendar) private var calendar
     @Query private var sessions: [WorkoutSession]
     @State private var workoutToDelete: WorkoutSession?
     @State private var showingDeleteConfirmation = false
@@ -68,6 +69,11 @@ struct WorkoutHistoryView: View {
     private var historyList: some View {
         List {
             if display == .profile {
+                Section("Annual Calendar") {
+                    AnnualWorkoutCalendarView(calendar: calendar)
+                        .themeListRow()
+                }
+
                 Section("History") {
                     workoutRows(Array(sessions.prefix(previewCount)))
 

@@ -28,7 +28,7 @@ struct ThemePickerView: View {
                             preview(option)
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(option.rawValue)
+                        .accessibilityLabel(option.displayName)
                         .accessibilityAddTraits(selection == option ? .isSelected : [])
                     }
                 }
@@ -54,7 +54,7 @@ struct ThemePickerView: View {
     private func preview(_ option: BodiesTheme) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(option.rawValue).font(.headline)
+                Text(option.displayName).font(.headline)
                 Spacer(minLength: 4)
                 Image(systemName: selection == option ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(option.accent)

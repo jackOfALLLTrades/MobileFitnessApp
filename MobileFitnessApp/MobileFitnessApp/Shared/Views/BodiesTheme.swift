@@ -10,20 +10,23 @@ import SwiftUI
 enum BodiesTheme: String, CaseIterable {
     case light = "Light"
     case dark = "Dark"
-    case eggshell = "Eggshell"
+    case springCream = "Spring Cream"
     case xcode = "Xcode"
+
+    var displayName: String { self == .springCream ? "Spring" : rawValue }
 
     var colorScheme: ColorScheme {
         switch self {
-        case .light, .eggshell: .light
+        case .light, .springCream: .light
         case .dark, .xcode: .dark
         }
     }
 
     var accent: Color {
         switch self {
-        case .light, .dark: .blue
-        case .eggshell: Color(red: 0.37, green: 0.27, blue: 0.17)
+        case .light: .blue
+        case .dark: Color(red: 1.00, green: 0.63, blue: 0.30)
+        case .springCream: Color(red: 67.0 / 255, green: 176.0 / 255, blue: 42.0 / 255)
         case .xcode: Color(red: 0.76, green: 0.62, blue: 0.98)
         }
     }
@@ -31,8 +34,8 @@ enum BodiesTheme: String, CaseIterable {
     var background: Color {
         switch self {
         case .light: Color(red: 0.95, green: 0.95, blue: 0.97)
-        case .dark: .black
-        case .eggshell: Color(red: 0.95, green: 0.92, blue: 0.86)
+        case .dark: Color(red: 0.07, green: 0.07, blue: 0.08)
+        case .springCream: Color(red: 233.0 / 255, green: 233.0 / 255, blue: 230.0 / 255)
         case .xcode: Color(red: 0.12, green: 0.13, blue: 0.16)
         }
     }
@@ -40,13 +43,13 @@ enum BodiesTheme: String, CaseIterable {
     var surface: Color {
         switch self {
         case .light: .white
-        case .dark: Color(red: 0.11, green: 0.11, blue: 0.12)
-        case .eggshell: Color(red: 0.99, green: 0.97, blue: 0.93)
+        case .dark: Color(red: 0.13, green: 0.13, blue: 0.14)
+        case .springCream: Color(red: 0.98, green: 0.97, blue: 0.95)
         case .xcode: Color(red: 0.17, green: 0.18, blue: 0.22)
         }
     }
 
-    var usesCustomSurfaces: Bool { self == .eggshell || self == .xcode }
+    var usesCustomSurfaces: Bool { self != .light }
 }
 
 private struct ThemeBackground: ViewModifier {

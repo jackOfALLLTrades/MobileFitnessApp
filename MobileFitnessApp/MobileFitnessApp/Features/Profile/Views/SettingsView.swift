@@ -53,7 +53,7 @@ struct SettingsView: View {
                 Button {
                     showingThemePicker = true
                 } label: {
-                    LabeledContent("Theme", value: theme.rawValue)
+                    LabeledContent("Theme", value: theme.displayName)
                 }
             }
             .themeListRow()
