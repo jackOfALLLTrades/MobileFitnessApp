@@ -50,11 +50,11 @@ struct HomeView: View {
                 .tag(2)
 
             // Added Calendar view -- pending github style
-            withWorkoutBanner(CalendarView())
-                .tabItem {
-                    Label("Calendar", systemImage: "calendar")
-                }
-                .tag(3)
+//            withWorkoutBanner(CalendarView())
+//                .tabItem {
+//                    Label("Calendar", systemImage: "calendar")
+//               }
+//               .tag(3)
         }
         .fullScreenCover(isPresented: activeWorkoutPresentation) {
             if let session = workoutSessionManager.activeSession {
