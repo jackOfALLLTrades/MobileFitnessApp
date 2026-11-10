@@ -57,6 +57,10 @@ struct SettingsView: View {
                 }
             }
             .themeListRow()
+
+#if DEBUG
+            DeveloperHistorySection()
+#endif
         }
         .themeBackground()
         .navigationTitle("Settings")

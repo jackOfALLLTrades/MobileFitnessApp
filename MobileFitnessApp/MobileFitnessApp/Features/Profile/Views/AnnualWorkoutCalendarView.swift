@@ -17,6 +17,7 @@ struct AnnualWorkoutCalendarView: View {
     private let nextYear: Date
     private let cellSize: CGFloat = 12
     private let spacing: CGFloat = 3
+    private let monthLabelHeight: CGFloat = 16
 
     init(calendar preferredCalendar: Calendar, now: Date = .now) {
         var calendar = Calendar(identifier: .gregorian)
@@ -44,6 +45,7 @@ struct AnnualWorkoutCalendarView: View {
         VStack(alignment: .leading, spacing: 8) {
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: spacing) {
+                    weekdayLabels
                     ForEach(weekStarts, id: \.self) { weekStart in
                         weekColumn(starting: weekStart, workoutDays: workoutDays)
                     }
@@ -66,6 +68,22 @@ struct AnnualWorkoutCalendarView: View {
         .padding(.vertical, 4)
     }
 
+    private var weekdayLabels: some View {
+        let symbols = calendar.veryShortWeekdaySymbols
+        let firstIndex = calendar.firstWeekday - 1
+
+        return VStack(spacing: spacing) {
+            Color.clear.frame(width: cellSize, height: monthLabelHeight)
+            ForEach(symbols.indices, id: \.self) { offset in
+                Text(symbols[(firstIndex + offset) % symbols.count])
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .frame(width: cellSize, height: cellSize)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
     private func weekColumn(starting weekStart: Date, workoutDays: Set<Date>) -> some View {
         let days = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart) }
         let monthStart = days.first {
@@ -74,7 +92,7 @@ struct AnnualWorkoutCalendarView: View {
 
         return VStack(spacing: spacing) {
             Color.clear
-                .frame(width: cellSize, height: 16)
+                .frame(width: cellSize, height: monthLabelHeight)
                 .overlay(alignment: .leading) {
                     if let monthStart {
                         Text(calendar.shortMonthSymbols[calendar.component(.month, from: monthStart) - 1])

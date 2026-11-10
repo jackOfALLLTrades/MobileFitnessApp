@@ -129,6 +129,7 @@ struct WorkoutHistoryView: View {
                 systemImage: "clock.arrow.circlepath",
                 description: Text("Finished workouts will show up here.")
             )
+            .themeListRow()
         } else {
             ForEach(workouts) { session in
                 NavigationLink {
