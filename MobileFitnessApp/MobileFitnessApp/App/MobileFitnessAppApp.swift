@@ -5,6 +5,7 @@
 //  Created by Kaden Brooks on 10/22/26.
 //
 
+
 import SwiftUI
 import SwiftData
 
@@ -30,11 +31,8 @@ struct MobileFitnessAppApp: App {
                     }
                 }
             }
-
-            HomeView()
-                .environmentObject(workoutSessionManager)
-                .tint(theme.accent)
-                .preferredColorScheme(theme.colorScheme)
+            .tint(theme.accent)
+            .preferredColorScheme(theme.colorScheme)
         }
         .modelContainer(for: [
             Exercise.self,
