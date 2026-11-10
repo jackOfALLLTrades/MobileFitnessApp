@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RoutineExerciseSection: View {
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
     let exercise: Exercise
     let rows: [UUID]
     let onReorder: () -> Void
@@ -64,11 +66,14 @@ struct RoutineExerciseSection: View {
                 }
             }
             .listRowSeparator(.hidden)
+            .themeListRow()
 
-            SetColumnHeadings(style: .routine, exerciseName: exercise.name)
+            SetColumnHeadings(loggingMode: exercise.loggingMode)
+                .themeListRow()
 
             ForEach(Array(rows.enumerated()), id: \.element) { index, rowID in
-                RoutineSetRow(number: index + 1)
+                RoutineSetRow(number: index + 1, showsWeight: exercise.loggingMode.showsWeight)
+                    .themeListRow()
                 .swipeActions(
                     edge: .trailing,
                     allowsFullSwipe: false
@@ -90,10 +95,13 @@ struct RoutineExerciseSection: View {
                 onAddSet()
             } label: {
                 Label("Add Set", systemImage: "plus")
+                    .foregroundStyle(theme.accent)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
+            .tint(theme.accent)
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 

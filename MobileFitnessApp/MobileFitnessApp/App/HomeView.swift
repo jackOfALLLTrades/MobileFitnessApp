@@ -8,6 +8,10 @@
 import SwiftUI
 import SwiftData
 
+extension EnvironmentValues {
+    @Entry var tabBottomScrollMargin: CGFloat = 0
+}
+
 struct HomeView: View {
 
     // MARK: - Dependencies
@@ -16,6 +20,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
 
     // MARK: - Presentation State
+
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
 
     @State private var selectedTab = 0
     @State private var showingCancelConfirmation = false
@@ -37,22 +43,19 @@ struct HomeView: View {
                 }
                 .tag(1)
 
-            withWorkoutBanner(WorkoutHistoryView())
+            withWorkoutBanner(WorkoutHistoryView(display: .profile))
                 .tabItem {
-                    Label("History", systemImage: "clock.arrow.circlepath")
+                    Label("Profile", systemImage: "person")
                 }
                 .tag(2)
-            
-            .tabItem {
-                Label("Profile", systemImage: "person")
-            }
-            .tag(2)
         }
         .fullScreenCover(isPresented: activeWorkoutPresentation) {
             if let session = workoutSessionManager.activeSession {
                 NavigationStack {
                     ActiveWorkoutView(session: session)
                 }
+                .tint(theme.accent)
+                .preferredColorScheme(theme.colorScheme)
             }
         }
         .confirmationDialog(
@@ -81,22 +84,26 @@ struct HomeView: View {
     private func withWorkoutBanner<Content: View>(
         _ content: Content
     ) -> some View {
-        content.safeAreaInset(edge: .bottom, spacing: 0) {
-            if let session = workoutSessionManager.activeSession,
-               workoutSessionManager.isMinimized {
-                MinimizedWorkoutBanner(
-                    session: session,
-                    onReopen: {
-                        selectedTab = 1
-                        workoutSessionManager.reopenSession()
-                    },
-                    onDiscard: { showingCancelConfirmation = true }
-                )
+        let showsBanner = workoutSessionManager.activeSession != nil
+            && workoutSessionManager.isMinimized
+        return content
+            .environment(\.tabBottomScrollMargin, showsBanner ? 88 : 16)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if let session = workoutSessionManager.activeSession,
+                   showsBanner {
+                    MinimizedWorkoutBanner(
+                        session: session,
+                        onReopen: {
+                            selectedTab = 1
+                            workoutSessionManager.reopenSession()
+                        },
+                        onDiscard: { showingCancelConfirmation = true }
+                    )
                     .padding(.horizontal, 12)
                     .padding(.top, 8)
                     .padding(.bottom, 6)
+                }
             }
-        }
     }
 
     // MARK: - Workout Presentation

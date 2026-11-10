@@ -15,7 +15,8 @@ struct AddExerciseView: View {
     @Query private var exercises: [Exercise]
 
     @State private var name = ""
-    @State private var muscleGroup = ""
+    @State private var muscleGroup: String?
+    @State private var loggingMode: ExerciseLoggingMode = .weighted
 
     private var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -37,8 +38,20 @@ struct AddExerciseView: View {
                 Section("Exercise Information") {
                     TextField("Exercise Name", text: $name)
 
-                    TextField("Muscle Group (Optional)", text: $muscleGroup)
+                    Picker("Muscle Group", selection: $muscleGroup) {
+                        Text("None").tag(nil as String?)
+                        ForEach(ExerciseBrowser.muscleGroupOrder, id: \.self) { group in
+                            Text(group).tag(Optional(group))
+                        }
+                    }
+
+                    Picker("Log", selection: $loggingMode) {
+                        ForEach(ExerciseLoggingMode.allCases, id: \.self) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
                 }
+                .themeListRow()
 
                 if isDuplicate {
                     Section {
@@ -47,6 +60,7 @@ struct AddExerciseView: View {
                     }
                 }
             }
+            .themeBackground()
             .navigationTitle("New Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -69,11 +83,8 @@ struct AddExerciseView: View {
     private func saveExercise() {
         let exercise = Exercise(
             name: trimmedName,
-            muscleGroup: muscleGroup.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            ).isEmpty ? nil : muscleGroup.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
+            muscleGroup: muscleGroup,
+            loggingMode: loggingMode
         )
 
         modelContext.insert(exercise)

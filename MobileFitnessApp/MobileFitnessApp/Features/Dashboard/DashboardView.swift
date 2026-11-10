@@ -6,28 +6,25 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
     var body: some View {
         NavigationStack {
-            VStack(spacing: 12) {
-                Image(systemName: "dumbbell")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
-
-                Text("Welcome to Bodies")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-
-                Text("Your workout journey starts here.")
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("Home")
+            WorkoutCalendarView()
+                .navigationTitle("Home")
         }
     }
 }
 
 #Preview {
     DashboardView()
+        .modelContainer(for: [
+            Exercise.self,
+            Routine.self,
+            RoutineExercise.self,
+            WorkoutSession.self,
+            WorkoutExercise.self,
+            WorkoutSet.self
+        ], inMemory: true)
 }

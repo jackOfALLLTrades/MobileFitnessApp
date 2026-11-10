@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MinimizedWorkoutBanner: View {
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
     let session: WorkoutSession
     let onReopen: () -> Void
     let onDiscard: () -> Void
@@ -21,7 +23,7 @@ struct MinimizedWorkoutBanner: View {
                 HStack(spacing: 12) {
                     Image(systemName: "chevron.up")
                         .font(.headline)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(theme.accent)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(session.name)

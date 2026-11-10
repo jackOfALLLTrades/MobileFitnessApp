@@ -20,10 +20,12 @@ struct ReorderExercisesView<Item: Identifiable>: View {
             ForEach(exercises) { exercise in
                 Text(exerciseName(exercise))
                     .padding(.vertical, 6)
+                    .themeListRow()
             }
             .onMove(perform: moveExercises)
         }
         .environment(\.editMode, .constant(.active))
+        .themeBackground()
         .navigationTitle("Reorder Exercises")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

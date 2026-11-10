@@ -9,19 +9,34 @@ import SwiftUI
 
 struct RoutineSetRow: View {
     let number: Int
+    let showsWeight: Bool
 
     var body: some View {
-        SetRowLayout(style: .routine) {
+        SetRowLayout(showsWeight: showsWeight) {
             Text("\(number)")
                 .font(.subheadline.weight(.medium))
         } previous: {
-            EmptyView()
+            Color.clear.frame(height: 1)
+                .accessibilityHidden(true)
         } weight: {
-            Text("—").foregroundStyle(.tertiary)
+            placeholder
         } reps: {
-            Text("—").foregroundStyle(.tertiary)
+            placeholder
         } completion: {
-            EmptyView()
+            Image(systemName: "circle")
+                .font(.title2)
+                .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
         }
+        .padding(.vertical, 3)
+    }
+
+    private var placeholder: some View {
+        Text("—")
+            .foregroundStyle(.tertiary)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+            .accessibilityHidden(true)
     }
 }

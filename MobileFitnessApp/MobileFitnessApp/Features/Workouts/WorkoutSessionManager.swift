@@ -25,8 +25,12 @@ final class WorkoutSessionManager: ObservableObject {
         isMinimized = false
     }
 
-    func finishWorkout(_ session: WorkoutSession, in modelContext: ModelContext) throws {
-        try WorkoutSessionService(modelContext: modelContext).finishSession(session)
+    func finishWorkout(
+        _ session: WorkoutSession,
+        in modelContext: ModelContext,
+        updateRoutine: Bool = false
+    ) throws {
+        try WorkoutSessionService(modelContext: modelContext).finishSession(session, updateRoutine: updateRoutine)
         clearSession()
     }
 

@@ -9,11 +9,14 @@ import SwiftUI
 import SwiftData
 
 private enum RoutineEditorSheet: Identifiable {
+    case selectExercises
     case reorder
     case replace(Exercise, id: UUID)
 
     var id: String {
         switch self {
+        case .selectExercises:
+            return "selectExercises"
         case .reorder:
             return "reorder"
         case .replace(_, let id):
@@ -29,6 +32,7 @@ struct RoutineEditorView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Query private var routines: [Routine]
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
 
     // MARK: - Editing and Presentation State
 
@@ -49,22 +53,24 @@ struct RoutineEditorView: View {
         Form {
             Section("Routine Information") {
                 TextField("Routine Name", text: $editor.routineName)
+                    .themeListRow()
             }
 
             Section {
-                NavigationLink {
-                    ExerciseSelectionView(
-                        selectedExercises: $editor.selectedExercises
-                    )
+                Button {
+                    activeSheet = .selectExercises
                 } label: {
                     Label("Select Exercises", systemImage: "plus")
+                        .foregroundStyle(theme.accent)
                 }
+                .themeListRow()
             }
 
             if editor.selectedExercises.isEmpty {
                 Section("Exercises") {
                     Text("No exercises selected.")
                         .foregroundStyle(.secondary)
+                        .themeListRow()
                 }
             } else {
                 ForEach(
@@ -85,12 +91,17 @@ struct RoutineEditorView: View {
                     Text("Sets can be removed by swiping left.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .themeListRow()
                 }
             }
         }
+        .themeBackground()
         .sheet(item: $activeSheet) { sheet in
             NavigationStack {
                 switch sheet {
+                case .selectExercises:
+                    ExerciseSelectionView(selectedExercises: $editor.selectedExercises)
+
                 case .reorder:
                     ReorderExercisesView(
                         exercises: $editor.selectedExercises,
@@ -106,11 +117,15 @@ struct RoutineEditorView: View {
                     }
                 }
             }
+            .tint(theme.accent)
+            .preferredColorScheme(theme.colorScheme)
         }
         .onChange(of: editor.selectedExercises.map(\.persistentModelID)) {
             _, _ in
             editor.syncSetRows()
         }
+        .tint(theme.accent)
+        .preferredColorScheme(theme.colorScheme)
         .navigationTitle(isEditing ? "Edit Routine" : "New Routine")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
