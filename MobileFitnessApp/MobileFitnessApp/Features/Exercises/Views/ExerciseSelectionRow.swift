@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ExerciseSelectionRow: View {
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
     let exercise: Exercise
     let isSelected: Bool
     let showsMuscleGroup: Bool
@@ -42,7 +44,7 @@ struct ExerciseSelectionRow: View {
             Spacer()
 
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? .blue : .secondary)
+                .foregroundStyle(isSelected ? theme.accent : Color.secondary)
         }
         .contentShape(Rectangle())
     }

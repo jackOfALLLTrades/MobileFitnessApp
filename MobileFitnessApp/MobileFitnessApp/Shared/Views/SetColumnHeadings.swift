@@ -8,22 +8,24 @@
 import SwiftUI
 
 struct SetColumnHeadings: View {
-    let style: SetRowStyle
-    var exerciseName: String = ""
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
+    let loggingMode: ExerciseLoggingMode
 
     var body: some View {
-        SetRowLayout(style: style) {
+        SetRowLayout(showsWeight: loggingMode.showsWeight) {
             Text("SET")
         } previous: {
             Text("PREVIOUS")
         } weight: {
-            Text("LBS")
+            Text(weightUnit == .pounds ? "LBS" : "KG")
         } reps: {
-            Text(exerciseName == "Plank" ? "SECS" : "REPS")
+            Text(loggingMode.countHeading)
         } completion: {
             Spacer()
         }
-        .font(style.headingFont.weight(.semibold))
+        .font(.caption2.weight(.semibold))
         .foregroundStyle(.secondary)
         .listRowSeparator(.hidden)
     }

@@ -13,6 +13,7 @@ struct RoutineListView: View {
     // MARK: - Dependencies
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.tabBottomScrollMargin) private var tabBottomScrollMargin
 
     @EnvironmentObject private var workoutSessionManager:
         WorkoutSessionManager
@@ -56,10 +57,13 @@ struct RoutineListView: View {
                             onDelete: { deleteRoutine(routine) },
                             onStart: { startWorkout(from: routine) }
                         )
+                        .themeListRow()
                     }
                     .onMove(perform: moveRoutines)
                 }
             }
+            .contentMargins(.bottom, tabBottomScrollMargin, for: .scrollContent)
+            .themeBackground()
             .navigationTitle("Routines")
             .toolbar {
 

@@ -17,6 +17,9 @@ final class Routine {
     @Relationship(deleteRule: .cascade, inverse: \RoutineExercise.routine)
     var exercises: [RoutineExercise] = []
 
+    @Relationship(deleteRule: .nullify, inverse: \WorkoutSession.sourceRoutine)
+    var workoutSessions: [WorkoutSession] = []
+
     init(name: String, sortOrder: Int = 0) {
         self.name = name
         self.sortOrder = sortOrder

@@ -67,6 +67,7 @@ struct WorkoutActionsView: View {
             }
             .padding(.vertical, 8)
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 }

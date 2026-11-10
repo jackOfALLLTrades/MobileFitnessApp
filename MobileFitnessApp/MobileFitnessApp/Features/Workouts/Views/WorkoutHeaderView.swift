@@ -44,6 +44,7 @@ struct WorkoutHeaderView: View {
             }
             .padding(.vertical, 4)
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 }

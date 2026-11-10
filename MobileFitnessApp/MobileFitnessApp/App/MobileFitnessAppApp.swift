@@ -11,6 +11,8 @@ import SwiftData
 @main
 struct MobileFitnessAppApp: App {
 
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
     @StateObject private var workoutSessionManager =
         WorkoutSessionManager()
 
@@ -18,6 +20,7 @@ struct MobileFitnessAppApp: App {
 
     var body: some Scene {
         WindowGroup {
+<<<<<<< HEAD
             ZStack {
                 HomeView()
                     .environmentObject(workoutSessionManager)
@@ -28,6 +31,12 @@ struct MobileFitnessAppApp: App {
                     }
                 }
             }
+=======
+            HomeView()
+                .environmentObject(workoutSessionManager)
+                .tint(theme.accent)
+                .preferredColorScheme(theme.colorScheme)
+>>>>>>> main
         }
         .modelContainer(for: [
             Exercise.self,

@@ -9,12 +9,15 @@ import SwiftUI
 import SwiftData
 
 struct WorkoutDetailView: View {
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
     let session: WorkoutSession
     
     private var exercises: [WorkoutExercise] {
         session.exercises
             .sorted {$0.order < $1.order }
-            .filter { !completedSets(for: $0).isEmpty }
+            .filter { !completedSets(for: $0).isEmpty || !notes(for: $0).isEmpty }
     }
     
     var body: some View {
@@ -32,16 +35,27 @@ struct WorkoutDetailView: View {
                     )
                 }
             }
+            .themeListRow()
             
-            if exercises.isEmpty {
+            if !exercises.contains(where: { !completedSets(for: $0).isEmpty }) {
                 Section {
                     Text("No sets were checked off in this workout.")
                         .foregroundStyle(.secondary)
                 }
+                .themeListRow()
             }
             
             ForEach(exercises) { exercise in
                 Section(exercise.exerciseName) {
+                    ForEach(notes(for: exercise)) { note in
+                        Label {
+                            Text(note.text)
+                        } icon: {
+                            Image(systemName: "note.text")
+                                .accessibilityHidden(true)
+                        }
+                    }
+
                     ForEach(
                         Array(completedSets(for: exercise).enumerated()),
                         id: \.element.persistentModelID
@@ -55,12 +69,21 @@ struct WorkoutDetailView: View {
                         }
                     }
                 }
+                .themeListRow()
             }
         }
+        .themeBackground()
         .navigationTitle(session.name)
+        .themedBackButton()
         .navigationBarTitleDisplayMode(.inline)
     }
     
+    private func notes(for exercise: WorkoutExercise) -> [WorkoutExerciseNote] {
+        exercise.visibleNotes.filter {
+            !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+
     private func completedSets(for exercise: WorkoutExercise) -> [WorkoutSet] {
         exercise.sets
             .filter(\.isCompleted)
@@ -70,12 +93,12 @@ struct WorkoutDetailView: View {
     private func setText(_ workoutSet: WorkoutSet, for exercise: WorkoutExercise) -> String {
         let reps = workoutSet.reps.map(String.init) ?? "-"
         
-        if exercise.exerciseName == "Plank" {
-            return "\(reps) sec"
+        if !exercise.loggingMode.showsWeight {
+            return exercise.loggingMode == .timed ? "\(reps) sec" : "\(reps) reps"
         }
         
-        let weight = workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0) } ?? "-"
-        return "\(weight) lb x \(reps)"
+        let weight = workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0, unit: weightUnit) } ?? "-"
+        return "\(weight) \(weightUnit.rawValue) x \(reps)"
     }
 }
 

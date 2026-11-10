@@ -16,7 +16,7 @@ final class ActiveWorkoutViewModel {
     // MARK: - Draft State and Dependencies
 
     // Keep partially typed values (such as "17.") intact while the numeric model is saved.
-    private var weightDrafts: [PersistentIdentifier: String] = [:]
+    private var weightDrafts: [PersistentIdentifier: (text: String, unit: WorkoutWeightUnit)] = [:]
     private var repsDrafts: [PersistentIdentifier: String] = [:]
 
     private let modelContext: ModelContext
@@ -49,7 +49,8 @@ final class ActiveWorkoutViewModel {
         for exercise in newExercises {
             let workoutExercise = WorkoutExercise(
                 exerciseName: exercise.name,
-                order: nextOrder
+                order: nextOrder,
+                loggingMode: exercise.loggingMode
             )
 
             workoutExercise.session = session
@@ -135,7 +136,12 @@ final class ActiveWorkoutViewModel {
 
     // Renaming the snapshot preserves this workout exercise's existing sets.
     func replaceExercise(_ exercise: WorkoutExercise, with replacement: Exercise) {
+        if exercise.exerciseName.caseInsensitiveCompare(replacement.name) != .orderedSame {
+            exercise.notes = nil
+            exercise.noteEntries = nil
+        }
         exercise.exerciseName = replacement.name
+        exercise.loggingMode = replacement.loggingMode
         saveChanges()
     }
 
@@ -151,19 +157,45 @@ final class ActiveWorkoutViewModel {
 
     // MARK: - Input Bindings
 
+    func addNote(to exercise: WorkoutExercise) {
+        exercise.noteEntries = exercise.visibleNotes + [WorkoutExerciseNote()]
+        saveChanges()
+    }
+
+    func removeNote(_ id: UUID, from exercise: WorkoutExercise) {
+        exercise.noteEntries = exercise.visibleNotes.filter { $0.id != id }
+        saveChanges()
+    }
+
+    func noteBinding(for id: UUID, in exercise: WorkoutExercise) -> Binding<String> {
+        Binding(
+            get: { exercise.visibleNotes.first(where: { $0.id == id })?.text ?? "" },
+            set: { value in
+                var notes = exercise.visibleNotes
+                guard let index = notes.firstIndex(where: { $0.id == id }) else { return }
+                notes[index].text = value
+                exercise.noteEntries = notes
+                self.saveChanges()
+            }
+        )
+    }
+
     func weightBinding(
-        for workoutSet: WorkoutSet
+        for workoutSet: WorkoutSet,
+        unit: WorkoutWeightUnit
     ) -> Binding<String> {
 
         let id = workoutSet.persistentModelID
 
         return Binding(
             get: {
-                self.weightDrafts[id] ??
-                workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0) } ?? ""
+                if let draft = self.weightDrafts[id], draft.unit == unit {
+                    return draft.text
+                }
+                return workoutSet.weight.map { WorkoutWeightFormatter.string(from: $0, unit: unit) } ?? ""
             },
             set: { newValue in
-                self.weightDrafts[id] = newValue
+                self.weightDrafts[id] = (newValue, unit)
 
                 let normalizedValue = newValue.replacingOccurrences(
                     of: ",",
@@ -173,7 +205,7 @@ final class ActiveWorkoutViewModel {
                 if normalizedValue.isEmpty {
                     workoutSet.weight = nil
                 } else if let value = Double(normalizedValue) {
-                    workoutSet.weight = value
+                    workoutSet.weight = unit.storedPounds(from: value)
                 }
 
                 self.saveChanges()

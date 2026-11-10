@@ -12,6 +12,13 @@ struct WorkoutExerciseSection: View {
 
     let exercise: WorkoutExercise
 
+    let previousNote: String?
+    let noteBinding: (UUID) -> Binding<String>
+    let onAddNote: () -> Void
+    let onRemoveNote: (UUID) -> Void
+
+    @FocusState private var focusedNote: UUID?
+
     let previousPerformance: (Int) -> String
 
     let weightBinding: (WorkoutSet) -> Binding<String>
@@ -33,6 +40,13 @@ struct WorkoutExerciseSection: View {
                     .font(.headline)
 
                 Spacer()
+
+                Button(action: onAddNote) {
+                    Image(systemName: "note.text.badge.plus")
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Add exercise note")
 
                 Menu {
                     Button(action: onReorderExercises) {
@@ -69,14 +83,47 @@ struct WorkoutExerciseSection: View {
                 }
             }
             .listRowSeparator(.hidden)
+            .themeListRow()
 
-            SetColumnHeadings(style: .workout, exerciseName: exercise.exerciseName)
+            ForEach(exercise.visibleNotes) { note in
+                let showHint = note.id == exercise.visibleNotes.first?.id && focusedNote != note.id
+
+                HStack(alignment: .top) {
+                    Image(systemName: "note.text")
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+
+                    TextField(
+                        "Exercise notes",
+                        text: noteBinding(note.id),
+                        prompt: Text(showHint ? (previousNote ?? "") : "")
+                            .foregroundColor(.secondary),
+                        axis: .vertical
+                    )
+                    .focused($focusedNote, equals: note.id)
+                }
+                .font(.subheadline)
+                .listRowSeparator(.hidden)
+                .themeListRow()
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        if focusedNote == note.id { focusedNote = nil }
+                        onRemoveNote(note.id)
+                    } label: {
+                        Label("Remove Note", systemImage: "trash")
+                    }
+                }
+            }
+
+            SetColumnHeadings(loggingMode: exercise.loggingMode)
+                .themeListRow()
 
             ForEach(
                 exercise.sets.sorted { $0.order < $1.order }
             ) { workoutSet in
                 WorkoutSetRow(
                     workoutSet: workoutSet,
+                    loggingMode: exercise.loggingMode,
                     previousPerformance: previousPerformance(
                         workoutSet.order
                     ),
@@ -86,6 +133,7 @@ struct WorkoutExerciseSection: View {
                         onToggleCompleted(workoutSet)
                     }
                 )
+                .themeListRow()
                 .swipeActions(
                     edge: .trailing,
                     allowsFullSwipe: false
@@ -113,6 +161,7 @@ struct WorkoutExerciseSection: View {
                     .fill(.quaternary.opacity(0.5))
             )
             .listRowSeparator(.hidden)
+            .themeListRow()
         }
     }
 }

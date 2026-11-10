@@ -28,6 +28,9 @@ private struct ActiveWorkoutContent: View {
     @Query(sort: \WorkoutSession.startDate, order: .reverse)
     private var workoutSessions: [WorkoutSession]
 
+    @AppStorage(AppPreferences.weightUnitKey)
+    private var weightUnit: WorkoutWeightUnit = .pounds
+
     @Query(sort: \Exercise.name)
     private var availableExercises: [Exercise]
 
@@ -36,13 +39,14 @@ private struct ActiveWorkoutContent: View {
     // MARK: - Presentation State
 
     @State private var showingFinishConfirmation = false
+    @State private var showingFinishError = false
     @State private var showingDiscardConfirmation = false
     @State private var showingExerciseSelection = false
     @State private var showingReplacementSelection = false
     @State private var showingReorderExercises = false
     @State private var showingDeleteExerciseConfirmation = false
     @State private var showingReplacementUnavailable = false
-    @State private var showingSettingsMessage = false
+    @State private var showingSettings = false
 
     @State private var selectedExercises: [Exercise] = []
     @State private var exercisesToReorder: [WorkoutExercise] = []
@@ -85,16 +89,22 @@ private struct ActiveWorkoutContent: View {
             ForEach(orderedExercises) { exercise in
                 WorkoutExerciseSection(
                     exercise: exercise,
+                    previousNote: exercise.visibleNotes.first?.text.isEmpty == true
+                        ? previousNotes(for: exercise) : nil,
+                    noteBinding: { workoutEditor.noteBinding(for: $0, in: exercise) },
+                    onAddNote: { workoutEditor.addNote(to: exercise) },
+                    onRemoveNote: { workoutEditor.removeNote($0, from: exercise) },
                     previousPerformance: { setOrder in
                         PreviousPerformanceLookup().previousPerformance(
                             for: exercise,
                             setOrder: setOrder,
                             before: session,
-                            in: workoutSessions
+                            in: workoutSessions,
+                            weightUnit: weightUnit
                         )
                     },
                     weightBinding: { workoutSet in
-                        workoutEditor.weightBinding(for: workoutSet)
+                        workoutEditor.weightBinding(for: workoutSet, unit: weightUnit)
                     },
                     repsBinding: { workoutSet in
                         workoutEditor.repsBinding(for: workoutSet)
@@ -124,6 +134,7 @@ private struct ActiveWorkoutContent: View {
                 Text("Sets can be removed by swiping left.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .themeListRow()
             }
 
             // MARK: - Workout Actions
@@ -133,13 +144,14 @@ private struct ActiveWorkoutContent: View {
                     prepareExerciseSelection()
                 },
                 onSettings: {
-                    showingSettingsMessage = true
+                    showingSettings = true
                 },
                 onDiscard: {
                     showingDiscardConfirmation = true
                 }
             )
         }
+        .themeBackground()
         .navigationTitle(session.name)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -208,6 +220,10 @@ private struct ActiveWorkoutContent: View {
             }
         }
 
+        .navigationDestination(isPresented: $showingSettings) {
+            SettingsView()
+        }
+
         // MARK: - Confirmation Dialogs
 
         .confirmationDialog(
@@ -215,13 +231,26 @@ private struct ActiveWorkoutContent: View {
             isPresented: $showingFinishConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Finish Workout") {
-                finishWorkout()
+            if routineToUpdate != nil {
+                Button("Update Routine") {
+                    finishWorkout(updateRoutine: true)
+                }
+                Button("Finish Without Updating") {
+                    finishWorkout()
+                }
+            } else {
+                Button("Finish Workout") {
+                    finishWorkout()
+                }
             }
 
             Button("Keep Working", role: .cancel) {}
         } message: {
-            Text("Your workout will be saved to your history.")
+            if let routine = routineToUpdate {
+                Text("Save this workout to history and update the exercise lineup in \(routine.name)?")
+            } else {
+                Text("Your workout will be saved to your history.")
+            }
         }
 
         .confirmationDialog(
@@ -260,6 +289,12 @@ private struct ActiveWorkoutContent: View {
 
         // MARK: - Alerts
 
+        .alert("Couldn’t Finish Workout", isPresented: $showingFinishError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Please try again.")
+        }
+
         .alert(
             "Exercise Unavailable",
             isPresented: $showingReplacementUnavailable
@@ -267,15 +302,6 @@ private struct ActiveWorkoutContent: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("This exercise could not be found in your exercise library, so it cannot be replaced.")
-        }
-
-        .alert(
-            "Workout Settings",
-            isPresented: $showingSettingsMessage
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("Workout settings will be available in a future update.")
         }
     }
 
@@ -348,11 +374,25 @@ private struct ActiveWorkoutContent: View {
 
     // MARK: - Workout Actions
 
-    private func finishWorkout() {
+    private func previousNotes(for exercise: WorkoutExercise) -> String? {
+        PreviousPerformanceLookup().previousNotes(
+            for: exercise,
+            before: session,
+            in: workoutSessions
+        )
+    }
+
+    private var routineToUpdate: Routine? {
+        WorkoutSessionService(modelContext: modelContext)
+            .routineToUpdate(for: session, catalog: availableExercises)
+    }
+
+    private func finishWorkout(updateRoutine: Bool = false) {
         do {
-            try workoutSessionManager.finishWorkout(session, in: modelContext)
+            try workoutSessionManager.finishWorkout(session, in: modelContext, updateRoutine: updateRoutine)
             dismiss()
         } catch {
+            showingFinishError = true
             print("Failed to finish workout: \(error)")
         }
     }
