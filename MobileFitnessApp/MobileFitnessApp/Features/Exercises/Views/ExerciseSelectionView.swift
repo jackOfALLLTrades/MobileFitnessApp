@@ -12,6 +12,7 @@ struct ExerciseSelectionView: View {
     // MARK: - Dependencies
 
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \Exercise.name)
@@ -85,6 +86,7 @@ struct ExerciseSelectionView: View {
                     showingAddExercise = true
                 } label: {
                     Image(systemName: "plus")
+                        .foregroundStyle(theme.accent)
                 }
             }
 
@@ -100,6 +102,7 @@ struct ExerciseSelectionView: View {
                     }
                 } label: {
                     Image(systemName: "arrow.up.arrow.down")
+                        .foregroundStyle(theme.accent)
                 }
             }
 
@@ -116,6 +119,7 @@ struct ExerciseSelectionView: View {
                 }
             }
         }
+        .tint(theme.accent)
         .sheet(isPresented: $showingAddExercise) {
             AddExerciseView()
         }

@@ -60,6 +60,7 @@ struct SettingsView: View {
         }
         .themeBackground()
         .navigationTitle("Settings")
+        .themedBackButton()
         .sheet(isPresented: $showingThemePicker) {
             ThemePickerView(theme: $theme)
         }

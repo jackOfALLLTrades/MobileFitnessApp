@@ -11,11 +11,10 @@ struct SetColumnHeadings: View {
     @AppStorage(AppPreferences.weightUnitKey)
     private var weightUnit: WorkoutWeightUnit = .pounds
 
-    let style: SetRowStyle
     let loggingMode: ExerciseLoggingMode
 
     var body: some View {
-        SetRowLayout(style: style, showsWeight: loggingMode.showsWeight) {
+        SetRowLayout(showsWeight: loggingMode.showsWeight) {
             Text("SET")
         } previous: {
             Text("PREVIOUS")
@@ -26,7 +25,7 @@ struct SetColumnHeadings: View {
         } completion: {
             Spacer()
         }
-        .font(style.headingFont.weight(.semibold))
+        .font(.caption2.weight(.semibold))
         .foregroundStyle(.secondary)
         .listRowSeparator(.hidden)
     }

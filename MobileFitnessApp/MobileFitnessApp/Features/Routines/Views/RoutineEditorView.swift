@@ -9,11 +9,14 @@ import SwiftUI
 import SwiftData
 
 private enum RoutineEditorSheet: Identifiable {
+    case selectExercises
     case reorder
     case replace(Exercise, id: UUID)
 
     var id: String {
         switch self {
+        case .selectExercises:
+            return "selectExercises"
         case .reorder:
             return "reorder"
         case .replace(_, let id):
@@ -54,12 +57,11 @@ struct RoutineEditorView: View {
             }
 
             Section {
-                NavigationLink {
-                    ExerciseSelectionView(
-                        selectedExercises: $editor.selectedExercises
-                    )
+                Button {
+                    activeSheet = .selectExercises
                 } label: {
                     Label("Select Exercises", systemImage: "plus")
+                        .foregroundStyle(theme.accent)
                 }
                 .themeListRow()
             }
@@ -97,6 +99,9 @@ struct RoutineEditorView: View {
         .sheet(item: $activeSheet) { sheet in
             NavigationStack {
                 switch sheet {
+                case .selectExercises:
+                    ExerciseSelectionView(selectedExercises: $editor.selectedExercises)
+
                 case .reorder:
                     ReorderExercisesView(
                         exercises: $editor.selectedExercises,
@@ -112,6 +117,8 @@ struct RoutineEditorView: View {
                     }
                 }
             }
+            .tint(theme.accent)
+            .preferredColorScheme(theme.colorScheme)
         }
         .onChange(of: editor.selectedExercises.map(\.persistentModelID)) {
             _, _ in

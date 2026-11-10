@@ -74,6 +74,7 @@ struct WorkoutDetailView: View {
         }
         .themeBackground()
         .navigationTitle(session.name)
+        .themedBackButton()
         .navigationBarTitleDisplayMode(.inline)
     }
     

@@ -76,7 +76,33 @@ private struct ThemeListRow: ViewModifier {
     }
 }
 
+private struct ThemedBackButton: ViewModifier {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage(AppPreferences.themeKey) private var theme: BodiesTheme = .light
+
+    func body(content: Content) -> some View {
+        content
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("Back", systemImage: "chevron.backward")
+                            .labelStyle(.iconOnly)
+                            .foregroundStyle(theme.accent)
+                    }
+                    .tint(theme.accent)
+                }
+            }
+    }
+}
+
 extension View {
+    func themedBackButton() -> some View {
+        modifier(ThemedBackButton())
+    }
+
     func themeBackground() -> some View {
         modifier(ThemeBackground())
     }

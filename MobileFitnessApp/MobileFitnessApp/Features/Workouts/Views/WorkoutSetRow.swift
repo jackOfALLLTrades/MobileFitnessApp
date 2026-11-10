@@ -21,7 +21,7 @@ struct WorkoutSetRow: View {
     let onToggleCompleted: () -> Void
 
     var body: some View {
-        SetRowLayout(style: .workout, showsWeight: loggingMode.showsWeight) {
+        SetRowLayout(showsWeight: loggingMode.showsWeight) {
 
             Text("\(workoutSet.order + 1)")
                 .font(.subheadline.weight(.medium))

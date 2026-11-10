@@ -68,6 +68,7 @@ struct WorkoutHistoryView: View {
             }
         } else {
             historyList
+                .themedBackButton()
         }
     }
 

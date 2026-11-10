@@ -115,7 +115,7 @@ struct WorkoutExerciseSection: View {
                 }
             }
 
-            SetColumnHeadings(style: .workout, loggingMode: exercise.loggingMode)
+            SetColumnHeadings(loggingMode: exercise.loggingMode)
                 .themeListRow()
 
             ForEach(
