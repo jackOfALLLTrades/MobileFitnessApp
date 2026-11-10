@@ -48,7 +48,6 @@ struct HomeView: View {
                     Label("Profile", systemImage: "person")
                 }
                 .tag(2)
-<<<<<<< HEAD
             
             .tabItem {
                 Label("Profile", systemImage: "person")
@@ -60,8 +59,8 @@ struct HomeView: View {
                     Label("Calendar", systemImage: "calendar")
                 }
                 .tag(3)
-=======
->>>>>>> main
+
+ 
         }
         .fullScreenCover(isPresented: activeWorkoutPresentation) {
             if let session = workoutSessionManager.activeSession {
@@ -169,7 +168,6 @@ struct HomeView: View {
             Routine.self,
             RoutineExercise.self,
             WorkoutSession.self,
-            WorkoutExercise.self,
             WorkoutSet.self
         ])
 }

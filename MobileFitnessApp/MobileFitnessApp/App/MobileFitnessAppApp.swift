@@ -20,7 +20,6 @@ struct MobileFitnessAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-<<<<<<< HEAD
             ZStack {
                 HomeView()
                     .environmentObject(workoutSessionManager)
@@ -31,12 +30,11 @@ struct MobileFitnessAppApp: App {
                     }
                 }
             }
-=======
+
             HomeView()
                 .environmentObject(workoutSessionManager)
                 .tint(theme.accent)
                 .preferredColorScheme(theme.colorScheme)
->>>>>>> main
         }
         .modelContainer(for: [
             Exercise.self,

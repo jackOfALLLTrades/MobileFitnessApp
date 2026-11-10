@@ -95,15 +95,14 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Banded Lateral Walk", muscleGroup: "Legs"),
 
         // Core
-<<<<<<< HEAD
         ExerciseDefinition(name: "Plank", muscleGroup: "Core"),
         ExerciseDefinition(name: "Crunch", muscleGroup: "Core"),
         ExerciseDefinition(name: "Hanging Leg Raise", muscleGroup: "Core"),
         ExerciseDefinition(name: "Russian Twist", muscleGroup: "Core"),
         ExerciseDefinition(name: "Dead Bug", muscleGroup: "Core"),
-        ExerciseDefinition(name: "Side Plank", muscleGroup: "Core")
+        ExerciseDefinition(name: "Side Plank", muscleGroup: "Core"),
 
-=======
+
         ExerciseDefinition(name: "Plank", muscleGroup: "Core", loggingMode: .timed),
         ExerciseDefinition(name: "Crunch", muscleGroup: "Core", loggingMode: .bodyweight),
         ExerciseDefinition(name: "Weighted Crunch", muscleGroup: "Core"),
@@ -114,7 +113,6 @@ enum ExerciseCatalog {
         ExerciseDefinition(name: "Cable Crunch", muscleGroup: "Core"),
         ExerciseDefinition(name: "Cable Pallof Press", muscleGroup: "Core"),
         ExerciseDefinition(name: "Banded Pallof Press", muscleGroup: "Core")
->>>>>>> main
     ]
 
     static func loggingMode(for name: String) -> ExerciseLoggingMode {

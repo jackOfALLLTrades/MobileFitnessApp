@@ -181,7 +181,7 @@ struct CalendarView: View {
             Routine.self,
             RoutineExercise.self,
             WorkoutSession.self,
-            SessionExercise.self,
+            WorkoutExercise.self,
             WorkoutSet.self
         ])
 }
